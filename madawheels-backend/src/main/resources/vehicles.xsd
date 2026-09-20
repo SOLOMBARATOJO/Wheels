@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://www.madawheels.com/vehicles"
+           targetNamespace="http://www.madawheels.com/vehicles"
+           elementFormDefault="qualified">
+
+    <!-- ===================== REQUEST ===================== -->
+    <xs:element name="searchVehiclesRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="departure" type="xs:string"/>
+                <xs:element name="destination" type="xs:string"/>
+                <xs:element name="date" type="xs:string"/>
+                <xs:element name="time" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- ===================== RESPONSE ===================== -->
+    <xs:element name="searchVehiclesResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="vehicle" type="tns:vehicle" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="vehicle">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long"/>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="type" type="xs:string"/>
+            <xs:element name="price" type="xs:decimal"/>
+            <xs:element name="available" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

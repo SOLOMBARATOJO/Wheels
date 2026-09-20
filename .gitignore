@@ -1,0 +1,21 @@
+# Backend (Maven / Java)
+madawheels-backend/target/
+madawheels-backend/.mvn/
+*.class
+
+# Frontend (Node / Vite)
+madawheels-frontend/node_modules/
+madawheels-frontend/dist/
+madawheels-frontend/.vite/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Socket demo compilé
+socket-demo/*.class
