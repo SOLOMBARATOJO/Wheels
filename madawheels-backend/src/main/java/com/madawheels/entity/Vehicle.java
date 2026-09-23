@@ -14,36 +14,44 @@ public class Vehicle {
     @Column(nullable = false, length = 100)
     private String name;
 
+    @Column(nullable = false, length = 100)
+    private String brand;
+
+    @Column(nullable = false, length = 100)
+    private String model;
+
     @Column(nullable = false, length = 50)
     private String type;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
+    @Column(nullable = false, length = 30)
+    private String transmission;
+
+    @Column(nullable = false)
+    private Integer seats;
+
+    @Column(nullable = false)
+    private Integer doors;
+
+    @Column(nullable = false, length = 30)
+    private String fuel;
+
+    @Column(name = "price_per_day", nullable = false, precision = 10, scale = 2)
+    private BigDecimal pricePerDay;
+
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
     @Column(nullable = false, length = 100)
     private String departure;
 
-    @Column(nullable = false, length = 100)
-    private String destination;
-
     @Column(nullable = false)
     private Boolean available;
 
-    // --- Constructeurs ---
-
     public Vehicle() {
     }
-
-    public Vehicle(String name, String type, BigDecimal price, String departure, String destination, Boolean available) {
-        this.name = name;
-        this.type = type;
-        this.price = price;
-        this.departure = departure;
-        this.destination = destination;
-        this.available = available;
-    }
-
-    // --- Getters et Setters ---
 
     public Long getId() {
         return id;
@@ -61,6 +69,22 @@ public class Vehicle {
         this.name = name;
     }
 
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
     public String getType() {
         return type;
     }
@@ -69,12 +93,60 @@ public class Vehicle {
         this.type = type;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public String getTransmission() {
+        return transmission;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public void setTransmission(String transmission) {
+        this.transmission = transmission;
+    }
+
+    public Integer getSeats() {
+        return seats;
+    }
+
+    public void setSeats(Integer seats) {
+        this.seats = seats;
+    }
+
+    public Integer getDoors() {
+        return doors;
+    }
+
+    public void setDoors(Integer doors) {
+        this.doors = doors;
+    }
+
+    public String getFuel() {
+        return fuel;
+    }
+
+    public void setFuel(String fuel) {
+        this.fuel = fuel;
+    }
+
+    public BigDecimal getPricePerDay() {
+        return pricePerDay;
+    }
+
+    public void setPricePerDay(BigDecimal pricePerDay) {
+        this.pricePerDay = pricePerDay;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getDeparture() {
@@ -83,14 +155,6 @@ public class Vehicle {
 
     public void setDeparture(String departure) {
         this.departure = departure;
-    }
-
-    public String getDestination() {
-        return destination;
-    }
-
-    public void setDestination(String destination) {
-        this.destination = destination;
     }
 
     public Boolean getAvailable() {

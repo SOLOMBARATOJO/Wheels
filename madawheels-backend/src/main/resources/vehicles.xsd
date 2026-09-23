@@ -1,38 +1,221 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:tns="http://www.madawheels.com/vehicles"
-           targetNamespace="http://www.madawheels.com/vehicles"
-           elementFormDefault="qualified">
-
-    <!-- ===================== REQUEST ===================== -->
-    <xs:element name="searchVehiclesRequest">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="departure" type="xs:string"/>
-                <xs:element name="destination" type="xs:string"/>
-                <xs:element name="date" type="xs:string"/>
-                <xs:element name="time" type="xs:string"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-
-    <!-- ===================== RESPONSE ===================== -->
-    <xs:element name="searchVehiclesResponse">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="vehicle" type="tns:vehicle" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-
-    <xs:complexType name="vehicle">
-        <xs:sequence>
-            <xs:element name="id" type="xs:long"/>
-            <xs:element name="name" type="xs:string"/>
-            <xs:element name="type" type="xs:string"/>
-            <xs:element name="price" type="xs:decimal"/>
-            <xs:element name="available" type="xs:boolean"/>
-        </xs:sequence>
-    </xs:complexType>
-
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.madawheels.com/vehicles" targetNamespace="http://www.madawheels.com/vehicles" elementFormDefault="qualified">
+<!--  =========================
+         SEARCH REQUEST / RESPONSE (inchangé)
+         =========================  -->
+<xs:element name="searchVehiclesRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="departure" type="xs:string"/>
+<xs:element name="returnLocation" type="xs:string"/>
+<xs:element name="startDate" type="xs:string"/>
+<xs:element name="startTime" type="xs:string"/>
+<xs:element name="endDate" type="xs:string"/>
+<xs:element name="endTime" type="xs:string"/>
+<xs:element name="driverAge" type="xs:int"/>
+<!-- Filtres de flotte (optionnels, 0 = non filtré) -->
+<xs:element name="type" type="xs:string" minOccurs="0"/>
+<xs:element name="transmission" type="xs:string" minOccurs="0"/>
+<xs:element name="fuel" type="xs:string" minOccurs="0"/>
+<xs:element name="maxPrice" type="xs:decimal" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="searchVehiclesResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="vehicle" type="tns:vehicle" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:complexType name="vehicle">
+<xs:sequence>
+<xs:element name="id" type="xs:long"/>
+<xs:element name="name" type="xs:string"/>
+<xs:element name="brand" type="xs:string"/>
+<xs:element name="model" type="xs:string"/>
+<xs:element name="type" type="xs:string"/>
+<xs:element name="transmission" type="xs:string"/>
+<xs:element name="seats" type="xs:int"/>
+<xs:element name="doors" type="xs:int"/>
+<xs:element name="fuel" type="xs:string"/>
+<xs:element name="pricePerDay" type="xs:decimal"/>
+<xs:element name="imageUrl" type="xs:string" minOccurs="0"/>
+<xs:element name="description" type="xs:string" minOccurs="0"/>
+<xs:element name="departure" type="xs:string"/>
+<xs:element name="available" type="xs:boolean"/>
+</xs:sequence>
+</xs:complexType>
+<!--  =========================
+         CREATE RESERVATION (avec options / assurances)
+         =========================  -->
+<xs:complexType name="selectedOption">
+<xs:sequence>
+<xs:element name="optionId" type="xs:long"/>
+<xs:element name="quantity" type="xs:int" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+<xs:element name="createReservationRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="firstName" type="xs:string"/>
+<xs:element name="lastName" type="xs:string"/>
+<xs:element name="email" type="xs:string"/>
+<xs:element name="phone" type="xs:string"/>
+<xs:element name="vehicleId" type="xs:long"/>
+<xs:element name="departure" type="xs:string"/>
+<xs:element name="returnLocation" type="xs:string"/>
+<xs:element name="startDate" type="xs:string"/>
+<xs:element name="startTime" type="xs:string"/>
+<xs:element name="endDate" type="xs:string"/>
+<xs:element name="endTime" type="xs:string"/>
+<xs:element name="driverAge" type="xs:int"/>
+<xs:element name="selectedOption" type="tns:selectedOption" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:complexType name="reservationOption">
+<xs:sequence>
+<xs:element name="optionId" type="xs:long"/>
+<xs:element name="name" type="xs:string"/>
+<xs:element name="quantity" type="xs:int"/>
+<xs:element name="unitPrice" type="xs:decimal"/>
+<xs:element name="totalPrice" type="xs:decimal"/>
+</xs:sequence>
+</xs:complexType>
+<xs:element name="createReservationResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="reservationId" type="xs:long"/>
+<xs:element name="reference" type="xs:string"/>
+<xs:element name="status" type="xs:string"/>
+<xs:element name="vehiclePrice" type="xs:decimal"/>
+<xs:element name="optionsPrice" type="xs:decimal"/>
+<xs:element name="totalPrice" type="xs:decimal"/>
+<xs:element name="emailSent" type="xs:boolean"/>
+<xs:element name="option" type="tns:reservationOption" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<!--  =========================
+         FIND RESERVATIONS (mes réservations, par email)
+         =========================  -->
+<xs:element name="findReservationsRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="email" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:complexType name="reservationSummary">
+<xs:sequence>
+<xs:element name="reservationId" type="xs:long"/>
+<xs:element name="reference" type="xs:string"/>
+<xs:element name="status" type="xs:string"/>
+<xs:element name="vehicleId" type="xs:long"/>
+<xs:element name="vehicleName" type="xs:string"/>
+<xs:element name="vehicleImage" type="xs:string" minOccurs="0"/>
+<xs:element name="departure" type="xs:string"/>
+<xs:element name="returnLocation" type="xs:string"/>
+<xs:element name="startDate" type="xs:string"/>
+<xs:element name="startTime" type="xs:string"/>
+<xs:element name="endDate" type="xs:string"/>
+<xs:element name="endTime" type="xs:string"/>
+<xs:element name="vehiclePrice" type="xs:decimal"/>
+<xs:element name="optionsPrice" type="xs:decimal"/>
+<xs:element name="totalPrice" type="xs:decimal"/>
+<xs:element name="createdAt" type="xs:string" minOccurs="0"/>
+<xs:element name="option" type="tns:reservationOption" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+<xs:element name="findReservationsResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="reservation" type="tns:reservationSummary" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<!--  =========================
+         AUTHENTIFICATION (inscription, vérification par code, connexion)
+         =========================  -->
+<xs:complexType name="userInfo">
+<xs:sequence>
+<xs:element name="userId" type="xs:long"/>
+<xs:element name="firstName" type="xs:string"/>
+<xs:element name="lastName" type="xs:string"/>
+<xs:element name="email" type="xs:string"/>
+<xs:element name="phone" type="xs:string"/>
+<xs:element name="role" type="xs:string"/>
+<xs:element name="status" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:element name="registerRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="firstName" type="xs:string"/>
+<xs:element name="lastName" type="xs:string"/>
+<xs:element name="email" type="xs:string"/>
+<xs:element name="phone" type="xs:string"/>
+<xs:element name="password" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="registerResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="userId" type="xs:long"/>
+<xs:element name="status" type="xs:string"/>
+<xs:element name="emailSent" type="xs:boolean"/>
+<xs:element name="message" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="verifyCodeRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="email" type="xs:string"/>
+<xs:element name="code" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="verifyCodeResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="success" type="xs:boolean"/>
+<xs:element name="user" type="tns:userInfo"/>
+<xs:element name="message" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="loginRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="email" type="xs:string"/>
+<xs:element name="password" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="loginResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="success" type="xs:boolean"/>
+<xs:element name="user" type="tns:userInfo"/>
+<xs:element name="message" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="getUserRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="userId" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="getUserResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="user" type="tns:userInfo"/>
+<xs:element name="message" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
 </xs:schema>
