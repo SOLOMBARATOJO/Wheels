@@ -70,7 +70,7 @@ export default function Fleet() {
   const handleSearch = () => {
     const effective = sameReturn ? params.departure : params.returnLocation;
     if (!params.departure || !effective || !params.startDate || !params.endDate) {
-      setError("Merci de renseigner le lieu de départ, le lieu de retour et les deux dates.");
+      setError("Veuillez renseigner le lieu de départ, le lieu de retour et les deux dates pour lancer la recherche.");
       return;
     }
     const q = new URLSearchParams();
