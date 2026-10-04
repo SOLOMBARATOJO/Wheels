@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import toast from "react-hot-toast";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+import { Settings2, Fuel, Users, DoorOpen, Snowflake } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import SearchWidget from "../components/SearchWidget";
@@ -8,6 +13,19 @@ import { VEHICLE_TYPES } from "../constants";
 import type { Vehicle, SearchParams } from "../types/vehicle";
 
 const FUELS = ["Essence", "Diesel"];
+
+function FleetCardSkeleton() {
+  return (
+    <div className="mw-fcard">
+      <Skeleton height={200} />
+      <div className="mw-fcard-body">
+        <Skeleton width="70%" height={20} />
+        <Skeleton width="100%" height={14} count={2} />
+        <Skeleton width="40%" height={30} />
+      </div>
+    </div>
+  );
+}
 
 export default function Fleet() {
   const navigate = useNavigate();
@@ -22,7 +40,6 @@ export default function Fleet() {
   });
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [transmissionFilter, setTransmissionFilter] = useState("");
   const [fuelFilter, setFuelFilter] = useState("");
@@ -31,6 +48,7 @@ export default function Fleet() {
 
   useEffect(() => {
     let active = true;
+    setLoading(true);
     searchVehicles({
       departure: "",
       returnLocation: "",
@@ -43,11 +61,14 @@ export default function Fleet() {
       transmission: transmissionFilter || undefined,
       fuel: fuelFilter || undefined,
     })
+      // .then((v) => {
+      //   if (active) setVehicles(v);
+      // })
       .then((v) => {
-        if (active) setVehicles(v);
-      })
+  if (active) setVehicles(v.filter((veh) => veh.available));
+})
       .catch((err) => {
-        if (active) setError(err instanceof Error ? err.message : "Erreur lors du chargement de la flotte.");
+        toast.error(err instanceof Error ? err.message : "Erreur lors du chargement de la flotte.");
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -70,7 +91,7 @@ export default function Fleet() {
   const handleSearch = () => {
     const effective = sameReturn ? params.departure : params.returnLocation;
     if (!params.departure || !effective || !params.startDate || !params.endDate) {
-      setError("Veuillez renseigner le lieu de départ, le lieu de retour et les deux dates pour lancer la recherche.");
+      toast.error("Veuillez renseigner le lieu de départ, le lieu de retour et les deux dates pour lancer la recherche.");
       return;
     }
     const q = new URLSearchParams();
@@ -180,7 +201,8 @@ export default function Fleet() {
                   className={`mw-chip ${fuelFilter === f ? "active" : ""}`}
                   onClick={() => setFuelFilter(fuelFilter === f ? "" : f)}
                 >
-                  ⛽ {f}
+                  <Fuel size={13} style={{ verticalAlign: -2, marginRight: 4 }} />
+                  {f}
                 </button>
               ))}
             </div>
@@ -211,16 +233,24 @@ export default function Fleet() {
           </span>
         </div>
 
-        {error && <div className="mw-error">{error}</div>}
-
         {loading ? (
-          <div className="mw-empty">Chargement de la flotte...</div>
+          <div className="mw-fleet-grid">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <FleetCardSkeleton key={i} />
+            ))}
+          </div>
         ) : filteredVehicles.length === 0 ? (
           <div className="mw-empty">Aucun véhicule ne correspond à ces critères.</div>
         ) : (
           <div className="mw-fleet-grid">
-            {filteredVehicles.map((v) => (
-              <div key={v.id} className="mw-fcard">
+            {filteredVehicles.map((v, i) => (
+              <motion.div
+                key={v.id}
+                className="mw-fcard"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25, delay: i * 0.05 }}
+              >
                 {v.imageUrl ? (
                   <img className="mw-fcard-img" src={v.imageUrl} alt={v.name} />
                 ) : (
@@ -231,29 +261,24 @@ export default function Fleet() {
                     <div>
                       <div className="mw-vcard-name">{v.brand} {v.model}</div>
                       <div className="mw-specs" style={{ marginTop: 8 }}>
-                        <span className="mw-spec">⚙️ {v.transmission}</span>
-                        <span className="mw-spec">⛽ {v.fuel}</span>
-                        <span className="mw-spec">👥 {v.seats} Personnes</span>
-                        <span className="mw-spec">🚪 {v.doors} Portes</span>
-                        {v.description && <span className="mw-spec">❄️ Climatisation</span>}
+                        <span className="mw-spec"><Settings2 size={13} /> {v.transmission}</span>
+                        <span className="mw-spec"><Fuel size={13} /> {v.fuel}</span>
+                        <span className="mw-spec"><Users size={13} /> {v.seats} Personnes</span>
+                        <span className="mw-spec"><DoorOpen size={13} /> {v.doors} Portes</span>
+                        {v.description && <span className="mw-spec"><Snowflake size={13} /> Climatisation</span>}
                       </div>
                     </div>
                     <span className="mw-vcard-price">{v.pricePerDay.toLocaleString()} €/jour</span>
                   </div>
+
                   <button
-                    className="mw-fcard-more"
-                    onClick={() => {
-                      const q = new URLSearchParams();
-                      Object.entries(params).forEach(([k, v]) => {
-                        if (v !== "" && v !== null && v !== undefined) q.set(k, String(v));
-                      });
-                      navigate(`/reserver?${q.toString()}`);
-                    }}
-                  >
-                    Plus de détails
-                  </button>
+  className="mw-fcard-more"
+  onClick={() => navigate(`/vehicules/${v.id}`)}
+>
+  Plus de détails
+</button>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}

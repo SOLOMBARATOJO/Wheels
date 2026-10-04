@@ -1,0 +1,60 @@
+.aws-page { padding: 36px 24px 72px; max-width: 760px; }
+.aws-title { font-size: 26px; font-weight: 800; color: var(--mw-heading, #111214); margin: 0 0 4px; }
+.aws-subtitle { margin: 0 0 24px; font-size: 14px; color: var(--mw-muted, #8a8f98); }
+
+.aws-panel {
+  background: var(--mw-white, #fff);
+  border-radius: var(--mw-radius-lg, 14px);
+  box-shadow: var(--mw-shadow, 0 4px 18px rgba(0, 0, 0, 0.06));
+  padding: 22px;
+  margin-bottom: 18px;
+}
+.aws-panel h2 { margin: 0 0 4px; font-size: 16px; font-weight: 800; color: var(--mw-heading, #111214); }
+.aws-panel-sub { margin: 0 0 16px; font-size: 12px; color: var(--mw-muted, #8a8f98); }
+
+.aws-profile { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; }
+.aws-avatar {
+  width: 52px; height: 52px; border-radius: 50%; background: #14161a; color: var(--mw-gold, #f5b301);
+  display: grid; place-items: center; font-weight: 800; font-size: 17px; flex-shrink: 0;
+}
+.aws-profile-name { font-weight: 800; font-size: 15px; color: var(--mw-heading, #111214); }
+.aws-profile-role { font-size: 12px; color: var(--mw-muted, #8a8f98); }
+.aws-field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.aws-field { display: grid; gap: 5px; }
+.aws-field label { font-size: 12px; font-weight: 700; color: var(--mw-heading, #111214); }
+.aws-field input {
+  border: 1px solid #dfe3e8; border-radius: 10px; padding: 10px 12px; font-size: 13px;
+  background: #f8f9fa; color: #555;
+}
+
+.aws-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid #f2f3f5;
+}
+.aws-row:last-child { border-bottom: none; }
+.aws-row-title { font-size: 13px; font-weight: 700; color: var(--mw-heading, #111214); }
+.aws-row-sub { font-size: 12px; color: var(--mw-muted, #8a8f98); margin-top: 2px; }
+
+/* Interrupteur */
+.aws-switch { position: relative; width: 42px; height: 24px; flex-shrink: 0; }
+.aws-switch input { opacity: 0; width: 0; height: 0; }
+.aws-switch span {
+  position: absolute; inset: 0; background: #dfe3e8; border-radius: 999px; cursor: pointer; transition: background 0.15s;
+}
+.aws-switch span::before {
+  content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px;
+  background: #fff; border-radius: 50%; transition: transform 0.15s; box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+.aws-switch input:checked + span { background: var(--mw-gold, #f5b301); }
+.aws-switch input:checked + span::before { transform: translateX(18px); }
+
+.aws-note {
+  display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: #8a6400;
+  background: #fff8e6; border: 1px solid #ffe9ad; border-radius: 10px; padding: 10px 12px; margin-top: 4px;
+}
+.aws-note svg { flex-shrink: 0; margin-top: 1px; }
+
+.aws-btn-disabled {
+  border: 1px solid #dfe3e8; background: #f4f5f7; color: #9aa0a8; border-radius: 9px;
+  padding: 9px 16px; font-size: 13px; font-weight: 700; cursor: not-allowed;
+}

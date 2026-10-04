@@ -1,5 +1,8 @@
 import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
+import { CheckCircle2 } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { register, verifyCode, saveSession } from "../services/authService";
@@ -19,7 +22,6 @@ export default function Inscription() {
   const [step, setStep] = useState<"form" | "code" | "done">("form");
   const [code, setCode] = useState("");
   const [codeSent, setCodeSent] = useState(false);
-  const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
   const inputs = useRef<Array<HTMLInputElement | null>>([]);
 
@@ -31,14 +33,13 @@ export default function Inscription() {
 
   const submit = async () => {
     if (!form.lastName || !form.firstName || !form.email || !form.phone || !form.password) {
-      setNotice("Merci de remplir tous les champs.");
+      toast.error("Merci de remplir tous les champs.");
       return;
     }
     if (form.password !== form.confirm) {
-      setNotice("Les deux mots de passe ne correspondent pas.");
+      toast.error("Les deux mots de passe ne correspondent pas.");
       return;
     }
-    setNotice("");
     setBusy(true);
     try {
       const result = await register({
@@ -49,18 +50,19 @@ export default function Inscription() {
         password: form.password,
       });
       if (result.status === "ACTIVE") {
+        toast.success("Compte créé, vous pouvez vous connecter.");
         navigate("/connexion");
         return;
       }
       setCodeSent(result.emailSent);
       setStep("code");
-      setNotice(
-        result.emailSent
-          ? `Un code de vérification à 6 chiffres a été envoyé à ${form.email}.`
-          : "Impossible d'envoyer le code par email pour le moment. Veuillez réessayer."
-      );
+      if (result.emailSent) {
+        toast.success(`Un code de vérification a été envoyé à ${form.email}.`);
+      } else {
+        toast.error("Impossible d'envoyer le code par email pour le moment. Veuillez réessayer.");
+      }
     } catch (err) {
-      setNotice(err instanceof Error ? err.message : "Erreur lors de l'inscription.");
+      toast.error(err instanceof Error ? err.message : "Erreur lors de l'inscription.");
     } finally {
       setBusy(false);
     }
@@ -68,21 +70,21 @@ export default function Inscription() {
 
   const submitCode = async () => {
     if (code.length !== CODE_LENGTH) {
-      setNotice("Saisissez les 6 chiffres du code reçu par email.");
+      toast.error("Saisissez les 6 chiffres du code reçu par email.");
       return;
     }
-    setNotice("");
     setBusy(true);
     try {
       const result = await verifyCode(form.email, code);
       if (!result.success) {
-        setNotice(result.message);
+        toast.error(result.message);
         return;
       }
       saveSession(result.user);
       setStep("done");
+      toast.success("Compte activé !");
     } catch (err) {
-      setNotice(err instanceof Error ? err.message : "Code invalide ou expiré.");
+      toast.error(err instanceof Error ? err.message : "Code invalide ou expiré.");
     } finally {
       setBusy(false);
     }
@@ -118,101 +120,100 @@ export default function Inscription() {
               ? `Saisissez le code à 6 chiffres envoyé à ${form.email}.`
               : "Créez votre compte pour réserver plus vite et suivre vos devis."}
           </p>
-          {notice && <div className="mw-error" style={{ margin: "0 0 14px" }}>{notice}</div>}
 
-          {step === "done" ? (
-            <div className="mw-note">
-              <span>✓</span>
-              <span>
-                Votre compte a bien été activé !{" "}
-                <Link to="/profil" className="mw-toggle">Accédez à votre espace personnel</Link>.
-              </span>
-            </div>
-          ) : step === "code" ? (
-            <>
-              <div
-                style={{
-                  display: "flex",
-                  gap: 8,
-                  margin: "18px 0 14px",
-                  justifyContent: "center",
-                }}
+          <AnimatePresence mode="wait">
+            {step === "done" ? (
+              <motion.div
+                key="done"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="mw-note"
               >
-                {codeParts.map((value, i) => (
-                  <input
-                    key={i}
-                    ref={(el) => {
-                      inputs.current[i] = el;
-                    }}
-                    inputMode="numeric"
-                    maxLength={1}
-                    value={value}
-                    onChange={(e) => onCodeChange(i, e.target.value)}
-                    onKeyDown={(e) => onCodeKey(i, e)}
-                    aria-label={`Chiffre ${i + 1} du code`}
-                    style={{
-                      width: 46,
-                      height: 54,
-                      textAlign: "center",
-                      fontSize: 24,
-                      fontWeight: 700,
-                      border: "1px solid #d0d5dd",
-                      borderRadius: 10,
-                      backgroundColor: value ? "#fff" : "#fafafa",
-                    }}
-                  />
-                ))}
-              </div>
-              {!codeSent && (
-                <div className="mw-error" style={{ marginBottom: 12 }}>
-                  L'envoi du code par email a échoué. Vérifiez la configuration SMTP puis relancez l'inscription.
+                <CheckCircle2 size={18} color="var(--mw-green)" />
+                <span>
+                  Votre compte a bien été activé !{" "}
+                  <Link to="/profil" className="mw-toggle">Accédez à votre espace personnel</Link>.
+                </span>
+              </motion.div>
+            ) : step === "code" ? (
+              <motion.div key="code" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}>
+                <div style={{ display: "flex", gap: 8, margin: "18px 0 14px", justifyContent: "center" }}>
+                  {codeParts.map((value, i) => (
+                    <input
+                      key={i}
+                      ref={(el) => {
+                        inputs.current[i] = el;
+                      }}
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={value}
+                      onChange={(e) => onCodeChange(i, e.target.value)}
+                      onKeyDown={(e) => onCodeKey(i, e)}
+                      aria-label={`Chiffre ${i + 1} du code`}
+                      style={{
+                        width: 46,
+                        height: 54,
+                        textAlign: "center",
+                        fontSize: 24,
+                        fontWeight: 700,
+                        border: "1px solid #d0d5dd",
+                        borderRadius: 10,
+                        backgroundColor: value ? "#fff" : "#fafafa",
+                      }}
+                    />
+                  ))}
                 </div>
-              )}
-              <button className="mw-btn btn-block" onClick={submitCode} disabled={busy}>
-                {busy ? "Vérification en cours..." : "Activer mon compte"}
-              </button>
-              <p className="mw-auth-sub" style={{ marginTop: 18 }}>
-                Vous n'avez pas reçu le code ?{" "}
-                <span className="mw-toggle" style={{ cursor: "pointer" }} onClick={submit}>Renvoyer le code</span>.
-              </p>
-            </>
-          ) : (
-            <>
-              <div className="mw-form-grid" style={{ marginBottom: 14 }}>
-                <div className="mw-field">
-                  <label>Nom</label>
-                  <input value={form.lastName} onChange={set("lastName")} placeholder="Votre nom" />
+                {!codeSent && (
+                  <div className="mw-note" style={{ marginBottom: 12 }}>
+                    <span>L'envoi du code par email a échoué. Vérifiez la configuration SMTP puis relancez l'inscription.</span>
+                  </div>
+                )}
+                <motion.button className="mw-btn btn-block" onClick={submitCode} disabled={busy} whileTap={{ scale: 0.97 }}>
+                  {busy ? "Vérification en cours..." : "Activer mon compte"}
+                </motion.button>
+                <p className="mw-auth-sub" style={{ marginTop: 18 }}>
+                  Vous n'avez pas reçu le code ?{" "}
+                  <span className="mw-toggle" style={{ cursor: "pointer" }} onClick={submit}>Renvoyer le code</span>.
+                </p>
+              </motion.div>
+            ) : (
+              <motion.div key="form" initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }}>
+                <div className="mw-form-grid" style={{ marginBottom: 14 }}>
+                  <div className="mw-field">
+                    <label>Nom</label>
+                    <input value={form.lastName} onChange={set("lastName")} placeholder="Votre nom" />
+                  </div>
+                  <div className="mw-field">
+                    <label>Prénom</label>
+                    <input value={form.firstName} onChange={set("firstName")} placeholder="Votre prénom" />
+                  </div>
+                  <div className="mw-field">
+                    <label>Email</label>
+                    <input type="email" value={form.email} onChange={set("email")} placeholder="votre.email@exemple.com" />
+                  </div>
+                  <div className="mw-field">
+                    <label>Téléphone</label>
+                    <input value={form.phone} onChange={set("phone")} placeholder="+261 33 00 000 00" />
+                  </div>
+                  <div className="mw-field">
+                    <label>Mot de passe</label>
+                    <input type="password" value={form.password} onChange={set("password")} placeholder="Votre mot de passe" />
+                  </div>
+                  <div className="mw-field">
+                    <label>Confirmer</label>
+                    <input type="password" value={form.confirm} onChange={set("confirm")} placeholder="Confirmez le mot de passe" />
+                  </div>
                 </div>
-                <div className="mw-field">
-                  <label>Prénom</label>
-                  <input value={form.firstName} onChange={set("firstName")} placeholder="Votre prénom" />
-                </div>
-                <div className="mw-field">
-                  <label>Email</label>
-                  <input type="email" value={form.email} onChange={set("email")} placeholder="votre.email@exemple.com" />
-                </div>
-                <div className="mw-field">
-                  <label>Téléphone</label>
-                  <input value={form.phone} onChange={set("phone")} placeholder="+261 33 00 000 00" />
-                </div>
-                <div className="mw-field">
-                  <label>Mot de passe</label>
-                  <input type="password" value={form.password} onChange={set("password")} placeholder="Votre mot de passe" />
-                </div>
-                <div className="mw-field">
-                  <label>Confirmer</label>
-                  <input type="password" value={form.confirm} onChange={set("confirm")} placeholder="Confirmez le mot de passe" />
-                </div>
-              </div>
-              <button className="mw-btn btn-block" onClick={submit} disabled={busy}>
-                {busy ? "Envoi en cours..." : "Enregistrer"}
-              </button>
-              <p className="mw-auth-sub" style={{ marginTop: 18 }}>
-                Vous avez déjà un compte ?{" "}
-                <Link to="/connexion" className="mw-toggle">Connectez-vous !</Link>
-              </p>
-            </>
-          )}
+                <motion.button className="mw-btn btn-block" onClick={submit} disabled={busy} whileTap={{ scale: 0.97 }}>
+                  {busy ? "Envoi en cours..." : "Enregistrer"}
+                </motion.button>
+                <p className="mw-auth-sub" style={{ marginTop: 18 }}>
+                  Vous avez déjà un compte ?{" "}
+                  <Link to="/connexion" className="mw-toggle">Connectez-vous !</Link>
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
       <Footer />

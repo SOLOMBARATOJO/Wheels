@@ -59,6 +59,31 @@ public class Reservation {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "payment_method", length = 30)
+    private String paymentMethod;
+
+    @Column(name = "card_holder", length = 150)
+    private String cardHolder;
+
+    @Column(name = "card_last4", length = 4)
+    private String cardLast4;
+
+    @Column(name = "paid_at")
+    private LocalDateTime paidAt;
+
+    @Column(name = "admin_note", columnDefinition = "TEXT")
+    private String adminNote;
+
+    // @Column(name = "refusal_reason", columnDefinition = "TEXT")
+    // private String refusalReason;
+
+        @Column(name = "refusal_reason", columnDefinition = "TEXT")
+    private String refusalReason;
+
+    @Column(name = "deleted_by_client", nullable = false)
+    private Boolean deletedByClient = false;
+
+
     public Reservation() {
     }
 
@@ -109,4 +134,29 @@ public class Reservation {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+
+    public String getCardHolder() { return cardHolder; }
+    public void setCardHolder(String cardHolder) { this.cardHolder = cardHolder; }
+
+    public String getCardLast4() { return cardLast4; }
+    public void setCardLast4(String cardLast4) { this.cardLast4 = cardLast4; }
+
+    public LocalDateTime getPaidAt() { return paidAt; }
+    public void setPaidAt(LocalDateTime paidAt) { this.paidAt = paidAt; }
+
+    public String getAdminNote() { return adminNote; }
+    public void setAdminNote(String adminNote) { this.adminNote = adminNote; }
+
+    // public String getRefusalReason() { return refusalReason; }
+    // public void setRefusalReason(String refusalReason) { this.refusalReason = refusalReason; }
+
+        public String getRefusalReason() { return refusalReason; }
+    public void setRefusalReason(String refusalReason) { this.refusalReason = refusalReason; }
+
+    public Boolean getDeletedByClient() { return deletedByClient; }
+    public void setDeletedByClient(Boolean deletedByClient) { this.deletedByClient = deletedByClient; }
 }

@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { LayoutDashboard, Car, CreditCard, FileText, Settings, LogOut } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { getSession, clearSession } from "../services/authService";
 
 const MENU = [
-  { id: "tableau", label: "Tableau de bord", icon: "📊" },
-  { id: "reservation", label: "Mes reservation", icon: "🚗" },
-  { id: "transaction", label: "Transaction", icon: "💳" },
-  { id: "devis", label: "Mes devis", icon: "📄" },
-  { id: "parametre", label: "Paramètre", icon: "⚙️" },
-  { id: "deconnexion", label: "Déconnexion", icon: "🚪" },
+  { id: "tableau", label: "Tableau de bord", icon: LayoutDashboard },
+  { id: "reservation", label: "Mes reservation", icon: Car },
+  { id: "transaction", label: "Transaction", icon: CreditCard },
+  { id: "devis", label: "Mes devis", icon: FileText },
+  { id: "parametre", label: "Paramètre", icon: Settings },
+  { id: "deconnexion", label: "Déconnexion", icon: LogOut },
 ];
 
 export default function Profil() {
@@ -67,17 +69,24 @@ export default function Profil() {
           </div>
           <nav className="mw-prof-menu">
             {MENU.map((m) => (
-              <button
+              <motion.button
                 key={m.id}
                 className={`mw-prof-item ${active === m.id && m.id !== "deconnexion" ? "active" : ""}`}
                 onClick={() => handleMenu(m.id)}
+                whileHover={{ x: 3 }}
               >
-                <span>{m.icon}</span> {m.label}
-              </button>
+                <m.icon size={16} /> {m.label}
+              </motion.button>
             ))}
           </nav>
         </aside>
-        <div className="mw-prof-main">
+        <motion.div
+          className="mw-prof-main"
+          key={active}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
+        >
           <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--mw-heading)", marginBottom: 16 }}>
             {MENU.find((m) => m.id === active)?.label}
           </h1>
@@ -90,7 +99,7 @@ export default function Profil() {
               Voir mes réservations →
             </Link>
           </div>
-        </div>
+        </motion.div>
       </div>
       <Footer />
     </>

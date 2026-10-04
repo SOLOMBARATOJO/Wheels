@@ -10,25 +10,43 @@ import java.util.List;
 
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
-    // Correspondance partielle et insensible à la casse : "antananarivo"
-    // trouve aussi bien "Antananarivo Ivato" que "Antananarivo Centre".
-    List<Vehicle> findByDepartureContainingIgnoreCaseAndAvailableTrue(String departure);
-
-    List<Vehicle> findByAvailableTrue();
-
-    // Recherche avec filtres de flotte (type / boîte / carburant / budget max).
-    // Chaque filtre est optionnel : la condition devient neutre quand la valeur
-    // est null, ce qui évite d'avoir à générer des requêtes dynamiques.
+    /**
+     * Catalogue client : tous les véhicules disponibles, quelle que soit l'agence
+     * de départ. Chaque filtre est optionnel : la condition est neutre quand la
+     * valeur est null.
+     */
     @Query("select v from Vehicle v " +
             "where v.available = true " +
-            "and (:departure is null or lower(v.departure) like lower(concat('%', :departure, '%'))) " +
             "and (:type is null or v.type = :type) " +
             "and (:transmission is null or v.transmission = :transmission) " +
             "and (:fuel is null or v.fuel = :fuel) " +
-            "and (:maxPrice is null or v.pricePerDay <= :maxPrice)")
-    List<Vehicle> searchVehicles(@Param("departure") String departure,
-                                 @Param("type") String type,
+            "and (:maxPrice is null or v.pricePerDay <= :maxPrice) " +
+            "order by v.pricePerDay asc")
+    List<Vehicle> searchVehicles(@Param("type") String type,
                                  @Param("transmission") String transmission,
                                  @Param("fuel") String fuel,
                                  @Param("maxPrice") BigDecimal maxPrice);
+
+    /**
+     * Recherche admin (tous les véhicules, disponibles ou non).
+     * Les paramètres ne sont JAMAIS null ici : PostgreSQL type un paramètre null
+     * comme bytea, ce qui fait échouer lower(...) ("function lower(bytea) does not exist").
+     * Une chaîne vide donne le motif '%%' qui correspond à tout.
+     */
+    @Query("select v from Vehicle v where " +
+            "(lower(v.name) like lower(concat('%', :keyword, '%')) " +
+            "  or lower(v.brand) like lower(concat('%', :keyword, '%')) " +
+            "  or lower(v.model) like lower(concat('%', :keyword, '%'))) " +
+            "and lower(v.departure) like lower(concat('%', :departure, '%')) " +
+            "order by v.id asc")
+    List<Vehicle> adminSearchQuery(@Param("keyword") String keyword, @Param("departure") String departure);
+
+    /** Point d'entrée conservé : AdminService n'a pas besoin de changer. */
+    default List<Vehicle> adminSearch(String keyword, String departure) {
+        return adminSearchQuery(keyword == null ? "" : keyword.trim(),
+                departure == null ? "" : departure.trim());
+    }
+
+    /** Utilisé par le tableau de bord admin. */
+    long countByAvailableTrue();
 }

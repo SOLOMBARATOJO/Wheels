@@ -1,0 +1,23 @@
+
+.mwct-page { padding: 36px 24px 72px; }
+.mwct-title { font-size: 26px; font-weight: 800; color: var(--mw-heading); margin: 0 0 4px; }
+.mwct-subtitle { margin: 0 0 20px; font-size: 14px; color: var(--mw-muted); }
+.mwct-summary { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--mw-heading); margin-bottom: 16px; }
+.mwct-total { color: var(--mw-gold-deep); }
+.mwct-list { display: grid; gap: 14px; }
+.mwct-card {
+  background: var(--mw-white); border-radius: var(--mw-radius-lg); box-shadow: var(--mw-shadow);
+  padding: 18px 20px; display: grid; grid-template-columns: minmax(0,1fr) 200px; gap: 14px;
+}
+.mwct-ref { font-weight: 800; color: var(--mw-heading); font-size: 14px; }
+.mwct-date { font-size: 12px; color: var(--mw-muted); margin: 2px 0 8px; }
+.mwct-vehicle { font-weight: 700; margin-bottom: 4px; }
+.mwct-route { font-size: 13px; color: #555; display: flex; align-items: center; gap: 6px; }
+.mwct-pay { border-left: 1px dashed #e5e7eb; padding-left: 16px; display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+.mwct-pay-total { font-size: 20px; font-weight: 800; color: var(--mw-heading); }
+.mwct-pay-method { font-size: 12px; color: var(--mw-muted); display: flex; align-items: center; gap: 6px; }
+.mwct-pay-card { font-size: 12px; color: #555; font-family: "Courier New", monospace; }
+@media (max-width: 640px) {
+  .mwct-card { grid-template-columns: 1fr; }
+  .mwct-pay { border-left: none; border-top: 1px dashed #e5e7eb; padding-left: 0; padding-top: 12px; }
+}

@@ -1,3 +1,5 @@
+import { MapPin, Phone, Mail } from "lucide-react";
+
 export default function Footer() {
   return (
     <footer className="mw-footer">
@@ -5,13 +7,23 @@ export default function Footer() {
         <div>
           <h4>Nos agences</h4>
           <p>Trouvez l'agence la plus proche</p>
-          <a className="f-item f-gold" href="/#contact">📍 Voir la carte des agences</a>
+          <a className="f-item f-gold" href="/#contact">
+            <MapPin size={14} style={{ marginRight: 6, verticalAlign: -2 }} />
+            Voir la carte des agences
+          </a>
         </div>
         <div>
           <h4>Supports</h4>
-          <a className="f-item" href="tel:+261348524671">+261 34 8524671</a>
-          <a className="f-item" href="tel:+261330876780">+261 33 0876780</a>
-          <a className="f-item f-gold" href="mailto:madawheels-madagascar@madauto.mg">madawheels-madagascar@madauto.mg</a>
+          <a className="f-item" href="tel:+261348524671">
+            <Phone size={13} style={{ marginRight: 6, verticalAlign: -2 }} />+261 34 8524671
+          </a>
+          <a className="f-item" href="tel:+261330876780">
+            <Phone size={13} style={{ marginRight: 6, verticalAlign: -2 }} />+261 33 0876780
+          </a>
+          <a className="f-item f-gold" href="mailto:madawheels-madagascar@madauto.mg">
+            <Mail size={13} style={{ marginRight: 6, verticalAlign: -2 }} />
+            madawheels-madagascar@madauto.mg
+          </a>
         </div>
         <div>
           <h4>Liens utiles</h4>

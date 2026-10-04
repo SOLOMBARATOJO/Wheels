@@ -53,4 +53,9 @@ export interface ReservationSummary {
   totalPrice: number;
   createdAt?: string;
   options: ReservationOptionLine[];
+  paymentMethod?: string;
+  cardHolder?: string;
+  cardLast4?: string;
+  paidAt?: string;
+  refusalReason?: string;
 }

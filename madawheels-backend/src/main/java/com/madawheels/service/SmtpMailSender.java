@@ -344,4 +344,188 @@ public class SmtpMailSender {
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;");
     }
+
+    @Value("${app.frontend-url:http://localhost:5173}")
+private String frontendUrl;
+
+public boolean sendPaymentRequestEmail(Reservation r, Vehicle v, User u) {
+    if (!enabled) {
+        log.warn("SMTP désactivé, email de demande de paiement non envoyé.");
+        return false;
+    }
+    String paymentLink = frontendUrl + "/paiement?ref=" + r.getReference();
+    String vehicleLabel = v != null ? v.getBrand() + " " + v.getModel() : "votre véhicule";
+
+    String htmlBody = "<div style=\"font-family:Segoe UI,Arial,Helvetica,sans-serif;background:#F4F5F7;"
+            + "color:#1A1A1A;max-width:640px;margin:0 auto;\">"
+            + "<div style=\"background:#111214;color:#fff;padding:20px 28px;display:flex;"
+            + "align-items:center;gap:10px;\">"
+            + "<span style=\"background:#F5B301;width:34px;height:34px;border-radius:8px;"
+            + "display:inline-block;text-align:center;line-height:34px;font-size:18px;\">🚗</span>"
+            + "<span style=\"font-weight:800;font-size:20px;\">MadaWheels</span>"
+            + "<span style=\"color:#F5B301;font-size:11px;font-weight:700;letter-spacing:1px;\">MADAGASCAR</span>"
+            + "</div>"
+            + "<div style=\"background:#fff;padding:28px;border-radius:0 0 14px 14px;\">"
+            + "<h2 style=\"margin:0 0 6px;font-size:20px;\">Votre réservation a été validée ✅</h2>"
+            + "<p style=\"margin:0 0 18px;font-weight:700;\">Référence : " + r.getReference() + "</p>"
+            + "<p style=\"margin:0 0 18px;line-height:1.6;\">Bonjour " + htmlEscape(u.getFirstName())
+            + ", notre équipe a vérifié la disponibilité de " + htmlEscape(vehicleLabel)
+            + " et confirme votre réservation. Il ne reste plus qu'à régler le montant par carte "
+            + "bancaire pour finaliser votre location.</p>"
+            + "<p style=\"text-align:center;margin:28px 0;\">"
+            + "<a href=\"" + paymentLink + "\" style=\"background:#F5B301;color:#111214;font-weight:700;"
+            + "padding:14px 32px;border-radius:10px;text-decoration:none;display:inline-block;font-size:15px;\">"
+            + "💳 Payer maintenant (" + r.getTotalPrice() + " €)</a></p>"
+            + "<p style=\"margin:0 0 18px;line-height:1.6;font-size:13px;color:#555;\">"
+            + "Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br/>"
+            + "<a href=\"" + paymentLink + "\" style=\"color:#111214;\">" + paymentLink + "</a></p>"
+            + "<p style=\"margin:0;line-height:1.6;\">Munissez-vous de votre numéro de devis "
+            + "<strong>" + r.getReference() + "</strong> et de votre carte bancaire.</p>"
+            + "</div>"
+            + "<div style=\"background:#111214;color:#9a9a9a;padding:18px 28px;font-size:12px;\">"
+            + "<strong style=\"color:#fff;\">MadaWheels</strong> · Antananarivo, Madagascar · "
+            + "+261 34 00 000 00 · contact@madauto.mg<br/>"
+            + "© 2026 MadaWheels — Tous droits réservés."
+            + "</div>"
+            + "</div>";
+
+    return sendHtml(u.getFirstName() + " " + u.getLastName(), u.getEmail(),
+            "Votre réservation MadaWheels est validée — paiement à finaliser", htmlBody,
+            "Email de demande de paiement envoyé à " + u.getEmail() + " pour la référence " + r.getReference());
+}
+
+public boolean sendReservationRefusedEmail(Reservation r, User u, String reason) {
+    if (!enabled) { log.warn("SMTP désactivé, email de refus non envoyé."); return false; }
+    String htmlBody = "<div style=\"font-family:Segoe UI,Arial,Helvetica,sans-serif;max-width:640px;margin:0 auto;\">"
+            + brandHeader()
+            + "<div style=\"background:#fff;padding:28px;border-radius:0 0 14px 14px;\">"
+            + "<h2>Votre demande n'a pas pu être confirmée</h2>"
+            + "<p style=\"font-weight:700;\">Référence : " + r.getReference() + "</p>"
+            + "<p>Bonjour " + htmlEscape(u.getFirstName()) + ", après vérification, notre équipe n'est "
+            + "malheureusement pas en mesure de confirmer cette réservation"
+            + (reason != null && !reason.isBlank() ? " : " + htmlEscape(reason) : ".")
+            + " N'hésitez pas à refaire une demande avec d'autres dates ou un autre véhicule.</p>"
+            + "</div>" + brandFooter() + "</div>";
+    return sendHtml(u.getFirstName() + " " + u.getLastName(), u.getEmail(),
+            "Votre demande de réservation MadaWheels", htmlBody, "Email de refus envoyé à " + u.getEmail());
+}
+
+public boolean sendPaymentConfirmedEmail(Reservation r, Vehicle v, User u) {
+    return sendPaymentConfirmedEmail(r, v, u, java.util.List.of());
+}
+
+public boolean sendPaymentConfirmedEmail(Reservation r, Vehicle v, User u,
+                                         java.util.List<ReservationService.OptionLine> optionLines) {
+    if (!enabled) {
+        log.warn("SMTP désactivé, reçu de paiement non envoyé.");
+        return false;
+    }
+    String htmlBody = buildReceiptHtml(r, v, u, optionLines);
+    return sendHtml(u.getFirstName() + " " + u.getLastName(), u.getEmail(),
+            "Reçu de paiement — Réservation " + r.getReference(), htmlBody,
+            "Reçu de paiement envoyé à " + u.getEmail() + " pour la référence " + r.getReference());
+}
+
+/** Reçu détaillé (façon "papier A4") : devis + infos client + détails du paiement. */
+private String buildReceiptHtml(Reservation r, Vehicle v, User u,
+                                java.util.List<ReservationService.OptionLine> optionLines) {
+    String vehicleLabel = v != null ? v.getBrand() + " " + v.getModel() : "Véhicule supprimé";
+    String period = "Du " + r.getStartDate().format(DATE_FMT) + " au " + r.getEndDate().format(DATE_FMT);
+    int days = Math.max(1,
+            (int) java.time.temporal.ChronoUnit.DAYS.between(r.getStartDate(), r.getEndDate()));
+
+    StringBuilder optionsHtml = new StringBuilder();
+    if (!optionLines.isEmpty()) {
+        optionsHtml.append("<table style=\"width:100%;border-collapse:collapse;margin-bottom:18px;\">")
+                .append("<tr><th colspan=\"4\" style=\"text-align:left;background:#F5B301;")
+                .append("padding:8px 12px;border:1px solid #E5E7EB;\">Options et assurances</th></tr>");
+        for (ReservationService.OptionLine line : optionLines) {
+            optionsHtml.append("<tr>")
+                    .append("<td style=\"padding:8px 12px;border:1px solid #E5E7EB;width:45%;\">")
+                    .append(htmlEscape(line.name())).append("</td>")
+                    .append("<td style=\"padding:8px 12px;border:1px solid #E5E7EB;\">x")
+                    .append(line.quantity()).append("</td>")
+                    .append("<td style=\"padding:8px 12px;border:1px solid #E5E7EB;width:25%;\">")
+                    .append(line.unitPrice()).append(" €</td>")
+                    .append("<td style=\"padding:8px 12px;border:1px solid #E5E7EB;text-align:right;\">")
+                    .append(line.totalPrice()).append(" €</td>")
+                    .append("</tr>");
+        }
+        optionsHtml.append("</table>");
+    }
+
+    String paidAt = r.getPaidAt() != null
+            ? r.getPaidAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy 'à' HH:mm"))
+            : "-";
+
+    return "<div style=\"font-family:Segoe UI,Arial,Helvetica,sans-serif;background:#F4F5F7;"
+            + "color:#1A1A1A;max-width:720px;margin:0 auto;\">"
+            + "<div style=\"background:#111214;color:#fff;padding:20px 28px;display:flex;"
+            + "align-items:center;gap:10px;\">"
+            + "<span style=\"background:#F5B301;width:34px;height:34px;border-radius:8px;"
+            + "display:inline-block;text-align:center;line-height:34px;font-size:18px;\">🚗</span>"
+            + "<span style=\"font-weight:800;font-size:20px;\">MadaWheels</span>"
+            + "<span style=\"color:#F5B301;font-size:11px;font-weight:700;letter-spacing:1px;\">MADAGASCAR</span>"
+            + "</div>"
+            + "<div style=\"background:#fff;padding:36px;border-radius:0 0 14px 14px;\">"
+
+            + "<div style=\"display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;\">"
+            + "<div><h1 style=\"margin:0;font-size:24px;color:#111214;\">Reçu de paiement</h1>"
+            + "<p style=\"margin:4px 0 0;color:#555;\">Référence : <strong>" + r.getReference() + "</strong></p></div>"
+            + "<div style=\"text-align:right;font-size:12px;color:#555;\">Payé le<br/><strong>" + paidAt + "</strong></div>"
+            + "</div>"
+
+            + "<table style=\"width:100%;border-collapse:collapse;margin-bottom:18px;\">"
+            + "<tr><th colspan=\"2\" style=\"text-align:left;background:#F5B301;padding:8px 12px;border:1px solid #E5E7EB;\">Client</th></tr>"
+            + row("Nom", u.getFirstName() + " " + u.getLastName())
+            + row("Email", u.getEmail())
+            + row("Téléphone", u.getPhone() != null ? u.getPhone() : "-")
+            + "</table>"
+
+            + "<table style=\"width:100%;border-collapse:collapse;margin-bottom:18px;\">"
+            + "<tr><th colspan=\"2\" style=\"text-align:left;background:#F5B301;padding:8px 12px;border:1px solid #E5E7EB;\">Détails de la location</th></tr>"
+            + row("Véhicule", vehicleLabel)
+            + row("Période", period + " (" + days + (days > 1 ? " jours)" : " jour)"))
+            + row("Lieu de départ", r.getDeparture())
+            + row("Lieu de retour", r.getReturnLocation())
+            + "</table>"
+
+            + optionsHtml
+
+            + "<table style=\"width:100%;border-collapse:collapse;margin-bottom:18px;\">"
+            + "<tr><th colspan=\"2\" style=\"text-align:left;background:#F5B301;padding:8px 12px;border:1px solid #E5E7EB;\">Montant</th></tr>"
+            + row("Véhicule", r.getVehiclePrice() + " €")
+            + row("Options", r.getOptionsPrice() + " €")
+            + "<tr><th style=\"text-align:left;background:#FAFAFA;padding:8px 12px;border:1px solid #E5E7EB;\">Total payé</th>"
+            + "<td style=\"padding:8px 12px;border:1px solid #E5E7EB;font-weight:700;\">" + r.getTotalPrice() + " €</td></tr>"
+            + "</table>"
+
+            + "<table style=\"width:100%;border-collapse:collapse;margin-bottom:18px;\">"
+            + "<tr><th colspan=\"2\" style=\"text-align:left;background:#F5B301;padding:8px 12px;border:1px solid #E5E7EB;\">Paiement</th></tr>"
+            + row("Méthode", "Carte bancaire")
+            + row("Titulaire", r.getCardHolder() != null ? r.getCardHolder() : "-")
+            + row("Carte", r.getCardLast4() != null ? "•••• •••• •••• " + r.getCardLast4() : "-")
+            + row("Statut", "Terminée ✅")
+            + "</table>"
+
+            + "<p style=\"font-size:12px;color:#777;line-height:1.6;margin-top:24px;\">"
+            + "Ce document tient lieu de reçu de paiement pour votre réservation MadaWheels. "
+            + "Conservez-le comme justificatif.</p>"
+            + "</div>"
+            + "<div style=\"background:#111214;color:#9a9a9a;padding:18px 28px;font-size:12px;\">"
+            + "<strong style=\"color:#fff;\">MadaWheels</strong> · Antananarivo, Madagascar · "
+            + "+261 34 00 000 00 · contact@madauto.mg<br/>"
+            + "© 2026 MadaWheels — Tous droits réservés."
+            + "</div>"
+            + "</div>";
+}
+
+private String brandHeader() {
+    return "<div style=\"background:#111214;color:#fff;padding:20px 28px;\">"
+            + "<span style=\"font-weight:800;font-size:20px;\">🚗 MadaWheels</span></div>";
+}
+private String brandFooter() {
+    return "<div style=\"background:#111214;color:#9a9a9a;padding:18px 28px;font-size:12px;\">"
+            + "MadaWheels · Antananarivo, Madagascar · contact@madauto.mg</div>";
+}
 }

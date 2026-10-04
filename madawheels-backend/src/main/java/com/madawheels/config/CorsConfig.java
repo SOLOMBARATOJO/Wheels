@@ -21,10 +21,11 @@ public class CorsConfig {
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/ws/**", config);
+        source.registerCorsConfiguration("/ws/**", config);   // SOAP
+        source.registerCorsConfiguration("/api/**", config);  // upload d'images
 
         FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
-        bean.setOrder(0); // priorité maximale : s'exécute avant le MessageDispatcherServlet
+        bean.setOrder(0); // priorité maximale : s'exécute avant les servlets
         return bean;
     }
 }

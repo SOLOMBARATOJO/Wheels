@@ -4,11 +4,15 @@ import com.madawheels.entity.Reservation;
 import com.madawheels.service.ReservationService;
 import com.madawheels.wsdl.CreateReservationRequest;
 import com.madawheels.wsdl.CreateReservationResponse;
+import com.madawheels.wsdl.DeleteReservationRequest;
+import com.madawheels.wsdl.DeleteReservationResponse;
 import com.madawheels.wsdl.FindReservationsRequest;
 import com.madawheels.wsdl.FindReservationsResponse;
 import com.madawheels.wsdl.ReservationOption;
 import com.madawheels.wsdl.ReservationSummary;
 import com.madawheels.wsdl.SelectedOption;
+import com.madawheels.wsdl.SubmitPaymentRequest;
+import com.madawheels.wsdl.SubmitPaymentResponse;
 
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
@@ -105,6 +109,10 @@ public class ReservationEndpoint {
             wsdlSummary.setOptionsPrice(summary.optionsPrice());
             wsdlSummary.setTotalPrice(summary.totalPrice());
             wsdlSummary.setCreatedAt(summary.createdAt());
+            wsdlSummary.setPaymentMethod(summary.paymentMethod());
+            wsdlSummary.setCardHolder(summary.cardHolder());
+            wsdlSummary.setCardLast4(summary.cardLast4());
+            wsdlSummary.setPaidAt(summary.paidAt());
 
             for (ReservationService.OptionLine line : summary.optionLines()) {
                 ReservationOption wsdlOption = new ReservationOption();
@@ -119,6 +127,28 @@ public class ReservationEndpoint {
             response.getReservation().add(wsdlSummary);
         }
 
+        return response;
+    }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "deleteReservationRequest")
+    @ResponsePayload
+    public DeleteReservationResponse deleteReservation(@RequestPayload DeleteReservationRequest request) {
+        DeleteReservationResponse response = new DeleteReservationResponse();
+        response.setMessage(
+                reservationService.deleteReservation(request.getUserId(), request.getReservationId()));
+        return response;
+    }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "submitPaymentRequest")
+    @ResponsePayload
+    public SubmitPaymentResponse submitPayment(@RequestPayload SubmitPaymentRequest request) {
+        ReservationService.PaymentResult result = reservationService.submitPayment(
+                request.getReference(), request.getCardHolder(), request.getCardNumber(), request.getExpiry());
+        SubmitPaymentResponse response = new SubmitPaymentResponse();
+        response.setReservationId(result.reservation().getId());
+        response.setStatus(result.reservation().getStatus());
+        response.setEmailSent(result.emailSent());
+        response.setMessage(result.message());
         return response;
     }
 }

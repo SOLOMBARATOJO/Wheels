@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import toast from "react-hot-toast";
+import { Users, Car, ShieldCheck, MapPin, Phone, Mail, Info } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import SearchWidget from "../components/SearchWidget";
@@ -22,6 +25,12 @@ const GUIDE_STEPS = [
   { n: 5, title: "Confirmer", text: "Validez votre devis et recevez votre numéro de réservation par email sous 24h ouvrées." },
 ];
 
+const FEATURES = [
+  { icon: Users, title: "Avec chauffeur", text: "Service chauffeur inclus et professionnels compétents pour vos déplacements en ville comme hors de la ville." },
+  { icon: Car, title: "Sans chauffeur", text: "Conduisez vous-même votre véhicule, en toute liberté, avec une assurance franchise incluse." },
+  { icon: ShieldCheck, title: "Flotte récente", text: "INEOS Grenadier, HYUNDAI County, NISSAN Navara, RENAULT Logan : des véhicules entretenus et climatisés." },
+];
+
 export default function Home() {
   const navigate = useNavigate();
   const [params, setParams] = useState<SearchParams>({
@@ -34,15 +43,13 @@ export default function Home() {
     driverAge: 23,
   });
   const [sameReturn, setSameReturn] = useState(false);
-  const [error, setError] = useState("");
 
   const handleSearch = () => {
     const effective = sameReturn ? params.departure : params.returnLocation;
     if (!params.departure || !effective || !params.startDate || !params.endDate) {
-      setError("Veuillez renseigner le lieu de départ, le lieu de retour et les deux dates pour lancer la recherche.");
+      toast.error("Veuillez renseigner le lieu de départ, le lieu de retour et les deux dates pour lancer la recherche.");
       return;
     }
-    setError("");
     navigate(`/reserver?${toQuery({ ...params, returnLocation: effective })}`);
   };
 
@@ -64,9 +71,14 @@ export default function Home() {
           </div>
           <div className="mw-hero-img-wrap">
             <img className="mw-hero-img" src="/hero.jpg" alt="Véhicules MadaWheels" />
-            <div className="mw-hero-badge">
-              <span>🚗 4</span> véhicules disponibles à Madagascar
-            </div>
+            <motion.div
+              className="mw-hero-badge"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.4 }}
+            >
+              <span><Car size={14} style={{ verticalAlign: -2, marginRight: 4 }} />Plusieurs</span> véhicules disponibles à Madagascar
+            </motion.div>
           </div>
         </div>
       </section>
@@ -84,8 +96,6 @@ export default function Home() {
         />
       </div>
 
-      {error && <div className="mw-container"><div className="mw-error">{error}</div></div>}
-
       <section className="mw-container" style={{ padding: "64px 24px 0" }}>
         <h2 className="mw-section-title" style={{ fontSize: 28, marginBottom: 12 }}>
           Comment réserver en ligne ?
@@ -95,12 +105,19 @@ export default function Home() {
           loueurs internationaux.
         </p>
         <div className="mw-guide">
-          {GUIDE_STEPS.map((s) => (
-            <div key={s.n} className="mw-guide-step">
+          {GUIDE_STEPS.map((s, i) => (
+            <motion.div
+              key={s.n}
+              className="mw-guide-step"
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.3, delay: i * 0.06 }}
+            >
               <div className="mw-guide-num">{s.n}</div>
               <div className="mw-guide-title">{s.title}</div>
               <p>{s.text}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
@@ -118,32 +135,23 @@ export default function Home() {
           <Link to="/vehicules" className="mw-btn">Découvrir notre flotte de véhicules →</Link>
         </div>
         <div className="mw-fleet-grid">
-          {[
-            {
-              icon: "👥",
-              title: "Avec chauffeur",
-              text: "Service chauffeur inclus et professionnels compétents pour vos déplacements en ville comme hors de la ville.",
-            },
-            {
-              icon: "🚗",
-              title: "Sans chauffeur",
-              text: "Conduisez vous-même votre véhicule, en toute liberté, avec une assurance franchise incluse.",
-            },
-            {
-              icon: "🚙",
-              title: "Flotte récente",
-              text: "INEOS Grenadier, HYUNDAI County, NISSAN Navara, RENAULT Logan : des véhicules entretenus et climatisés.",
-            },
-          ].map((f) => (
-            <div key={f.title} className="mw-fcard">
+          {FEATURES.map((f, i) => (
+            <motion.div
+              key={f.title}
+              className="mw-fcard"
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.3, delay: i * 0.08 }}
+            >
               <div className="mw-fcard-body">
-                <div style={{ fontSize: 34 }}>{f.icon}</div>
+                <f.icon size={30} color="var(--mw-gold)" />
                 <div className="mw-fcard-name" style={{ fontSize: 18, fontWeight: 700, color: "var(--mw-heading)" }}>
                   {f.title}
                 </div>
                 <p style={{ fontSize: 13, lineHeight: 1.6 }}>{f.text}</p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
@@ -154,7 +162,9 @@ export default function Home() {
         </h2>
         <div className="mw-contact-grid">
           <div>
-            <h3 className="mw-section-label" style={{ fontSize: 15 }}>📍 Nos agences</h3>
+            <h3 className="mw-section-label" style={{ fontSize: 15 }}>
+              <MapPin size={15} style={{ verticalAlign: -2, marginRight: 6 }} />Nos agences
+            </h3>
             <ul className="mw-contact-list">
               {AGENCIES.map((a) => (
                 <li key={a}>{a}</li>
@@ -165,17 +175,23 @@ export default function Home() {
             </p>
           </div>
           <div>
-            <h3 className="mw-section-label" style={{ fontSize: 15 }}>📞 Assistance téléphonique</h3>
+            <h3 className="mw-section-label" style={{ fontSize: 15 }}>
+              <Phone size={15} style={{ verticalAlign: -2, marginRight: 6 }} />Assistance téléphonique
+            </h3>
             <p className="mw-contact-item">+261 34 85 246 71</p>
             <p className="mw-contact-item">+261 33 087 67 80</p>
-            <h3 className="mw-section-label" style={{ fontSize: 15, marginTop: 18 }}>✉️ Email</h3>
+            <h3 className="mw-section-label" style={{ fontSize: 15, marginTop: 18 }}>
+              <Mail size={15} style={{ verticalAlign: -2, marginRight: 6 }} />Email
+            </h3>
             <p className="mw-contact-item">madawheels-madagascar@madauto.mg</p>
             <p style={{ fontSize: 13, lineHeight: 1.6, marginTop: 12 }}>
               Assistance disponible 24/24 · 7/7 pour la réservation et la modification de vos demandes.
             </p>
           </div>
           <div>
-            <h3 className="mw-section-label" style={{ fontSize: 15 }}>🛞 Bon à savoir</h3>
+            <h3 className="mw-section-label" style={{ fontSize: 15 }}>
+              <Info size={15} style={{ verticalAlign: -2, marginRight: 6 }} />Bon à savoir
+            </h3>
             <p style={{ fontSize: 13, lineHeight: 1.7 }}>
               L'âge minimum pour conduire est de 23 ans. Un service chauffeur est disponible en ville comme hors
               de la ville. Chaque véhicule est entretenu, climatisé et assuré avec franchise incluse.

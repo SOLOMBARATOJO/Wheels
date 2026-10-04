@@ -158,8 +158,8 @@ public class ReservationService {
                                      List<OptionLine> optionLines) {}
 
     /**
-     * Liste toutes les réservations d'un client (identifié par son email),
-     * chacune avec son véhicule et le détail des options choisies.
+     * Liste les réservations d'un client (identifié par son email) qu'il n'a pas
+     * supprimées de son historique, chacune avec son véhicule et ses options.
      */
     public List<ReservationSummary> findReservations(String email) {
         User user = userRepository.findByEmail(email)
@@ -167,7 +167,7 @@ public class ReservationService {
                         "Aucun compte trouvé pour cet email."));
 
         List<Reservation> reservations =
-                reservationRepository.findByUserIdOrderByCreatedAtDesc(user.getId());
+                reservationRepository.findByUserIdAndDeletedByClientFalseOrderByCreatedAtDesc(user.getId());
 
         List<ReservationSummary> summaries = new ArrayList<>();
         for (Reservation r : reservations) {
@@ -207,6 +207,10 @@ public class ReservationService {
                     r.getOptionsPrice(),
                     r.getTotalPrice(),
                     r.getCreatedAt() != null ? r.getCreatedAt().toString() : null,
+                    r.getPaymentMethod(),
+                    r.getCardHolder(),
+                    r.getCardLast4(),
+                    r.getPaidAt() != null ? r.getPaidAt().toString() : null,
                     optionLines
             ));
         }
@@ -230,5 +234,81 @@ public class ReservationService {
             BigDecimal optionsPrice,
             BigDecimal totalPrice,
             String createdAt,
+            String paymentMethod,
+            String cardHolder,
+            String cardLast4,
+            String paidAt,
             List<OptionLine> optionLines) {}
+
+    /**
+     * Suppression « douce » : la réservation est masquée de l'historique du
+     * client mais reste en base (transactions et statistiques de l'admin intactes).
+     * Seules les réservations terminées ou refusées peuvent être supprimées.
+     */
+    public String deleteReservation(Long userId, Long reservationId) {
+        Reservation r = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("Réservation introuvable."));
+        if (!r.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("Accès refusé : cette réservation ne vous appartient pas.");
+        }
+        if (!List.of("TERMINEE", "REFUSEE").contains(r.getStatus())) {
+            throw new IllegalArgumentException(
+                    "Seules les réservations terminées ou refusées peuvent être supprimées.");
+        }
+        r.setDeletedByClient(true);
+        reservationRepository.save(r);
+        return "Réservation supprimée de votre historique.";
+    }
+
+    public record PaymentResult(Reservation reservation, boolean emailSent, String message) {}
+
+    public PaymentResult submitPayment(String reference, String cardHolder, String cardNumber, String expiry) {
+        Reservation reservation = reservationRepository.findByReference(reference)
+                .orElseThrow(() -> new IllegalArgumentException("Numéro de devis introuvable."));
+
+        if (!"VALIDEE".equals(reservation.getStatus())) {
+            throw new IllegalArgumentException(
+                    "Cette réservation n'est pas en attente de paiement (statut actuel : " + reservation.getStatus() + ").");
+        }
+        if (cardHolder == null || cardHolder.isBlank()) {
+            throw new IllegalArgumentException("Le nom du titulaire de la carte est requis.");
+        }
+        String digits = cardNumber == null ? "" : cardNumber.replaceAll("\\s", "");
+        if (digits.length() < 12 || !digits.matches("\\d+")) {
+            throw new IllegalArgumentException("Numéro de carte invalide.");
+        }
+
+        reservation.setPaymentMethod("CARTE");
+        reservation.setCardHolder(cardHolder.trim());
+        reservation.setCardLast4(digits.substring(digits.length() - 4));
+        reservation.setPaidAt(java.time.LocalDateTime.now());
+        reservation.setStatus("TERMINEE");
+        reservation = reservationRepository.save(reservation);
+
+        User client = userRepository.findById(reservation.getUserId()).orElse(null);
+        Vehicle vehicle = vehicleRepository.findById(reservation.getVehicleId()).orElse(null);
+
+        // Reconstruire le détail des options pour le reçu.
+        long daysCount = Math.max(1, ChronoUnit.DAYS.between(reservation.getStartDate(), reservation.getEndDate()));
+        List<OptionLine> optionLines = new ArrayList<>();
+        for (ReservationOption ro : reservationOptionRepository.findByReservationId(reservation.getId())) {
+            boolean perDay = "jour".equalsIgnoreCase(ro.getOption().getUnit());
+            BigDecimal unitPrice = perDay
+                    ? ro.getOption().getPrice().multiply(BigDecimal.valueOf(daysCount))
+                    : ro.getOption().getPrice();
+            optionLines.add(new OptionLine(
+                    ro.getOption().getId(), ro.getOption().getName(), ro.getQuantity(),
+                    unitPrice, unitPrice.multiply(BigDecimal.valueOf(ro.getQuantity()))));
+        }
+
+        boolean emailSent = false;
+        if (client != null) {
+            try {
+                emailSent = smtpMailSender.sendPaymentConfirmedEmail(reservation, vehicle, client, optionLines);
+            } catch (RuntimeException ex) {
+                emailSent = false;
+            }
+        }
+        return new PaymentResult(reservation, emailSent, "Paiement enregistré, votre réservation est maintenant terminée.");
+    }
 }

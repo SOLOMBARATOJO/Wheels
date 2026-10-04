@@ -10,8 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
+    "framer-motion": "^13.4.4",
+    "lucide-react": "^1.48.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "react-hot-toast": "^2.6.1",
+    "react-loading-skeleton": "^3.5.0",
     "react-router-dom": "^7.18.4"
   },
   "devDependencies": {

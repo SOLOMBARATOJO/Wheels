@@ -1,0 +1,130 @@
+.awl-page { padding: 32px 24px 72px; }
+
+/* ---------- Hero animé ---------- */
+.awl-hero {
+  position: relative;
+  border-radius: var(--mw-radius-lg, 14px);
+  overflow: hidden;
+  background: linear-gradient(160deg, #14161a 0%, #1d2026 55%, #262a33 100%);
+  padding: 40px 36px 0;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+.awl-hero-text { position: relative; z-index: 2; max-width: 560px; }
+.awl-hero-eyebrow {
+  color: var(--mw-gold, #f5b301); font-size: 12px; font-weight: 800;
+  letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;
+}
+.awl-hero-title { color: #fff; font-size: 26px; font-weight: 800; margin: 0 0 10px; line-height: 1.25; }
+.awl-hero-sub { color: #c7c9ce; font-size: 14px; line-height: 1.6; margin: 0; }
+
+/* Scène animée : ciel étoilé léger + route défilante + voiture */
+.awl-scene { position: relative; height: 132px; overflow: hidden; }
+.awl-stars {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20px 20px, rgba(255,255,255,0.25), transparent),
+    radial-gradient(1.5px 1.5px at 120px 45px, rgba(255,255,255,0.18), transparent),
+    radial-gradient(1px 1px at 220px 15px, rgba(255,255,255,0.2), transparent),
+    radial-gradient(1.5px 1.5px at 320px 55px, rgba(255,255,255,0.15), transparent),
+    radial-gradient(1px 1px at 420px 25px, rgba(255,255,255,0.22), transparent);
+  background-size: 460px 100px;
+  opacity: 0.7;
+}
+.awl-skyline {
+  position: absolute; left: 0; right: 0; bottom: 56px; height: 44px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255,255,255,0.05) 0 18px,
+    transparent 18px 46px,
+    rgba(255,255,255,0.05) 46px 60px,
+    transparent 60px 96px
+  );
+  opacity: 0.5;
+}
+.awl-road {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 56px;
+  background: #2c2f36;
+  border-top: 2px solid #3a3e47;
+}
+.awl-road::before {
+  content: "";
+  position: absolute; top: 50%; left: 0; right: -80px; height: 4px;
+  transform: translateY(-50%);
+  background-image: repeating-linear-gradient(90deg, var(--mw-gold, #f5b301) 0 28px, transparent 28px 56px);
+  animation: awl-dash 1.1s linear infinite;
+}
+@keyframes awl-dash { from { background-position-x: 0; } to { background-position-x: -56px; } }
+
+.awl-car {
+  position: absolute; bottom: 10px; left: -140px;
+  display: flex; align-items: center; gap: 2px;
+  animation: awl-drive 7s ease-in-out infinite;
+}
+.awl-car-body {
+  width: 96px; height: 34px; border-radius: 10px 10px 6px 6px;
+  background: linear-gradient(180deg, var(--mw-gold, #f5b301), #d99a00);
+  position: relative;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+}
+.awl-car-body::before {
+  content: ""; position: absolute; top: -14px; left: 18px; width: 46px; height: 18px;
+  background: #14161a; border-radius: 8px 14px 0 0;
+}
+.awl-car-body::after {
+  content: ""; position: absolute; top: -11px; left: 22px; width: 16px; height: 13px;
+  background: rgba(180, 220, 255, 0.55); border-radius: 4px 8px 0 0;
+}
+.awl-wheel {
+  position: absolute; bottom: -7px; width: 16px; height: 16px; border-radius: 50%;
+  background: #14161a; border: 3px solid #55585f;
+  animation: awl-spin 0.4s linear infinite;
+}
+.awl-wheel.front { left: 12px; }
+.awl-wheel.back { left: 68px; }
+@keyframes awl-spin { to { transform: rotate(360deg); } }
+@keyframes awl-drive {
+  0%   { left: -140px; }
+  45%  { left: calc(100% - 40px); }
+  50%  { left: calc(100% - 40px); }
+  95%  { left: -140px; }
+  100% { left: -140px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .awl-car, .awl-road::before, .awl-wheel { animation: none; }
+}
+
+/* ---------- Accès rapide ---------- */
+.awl-section-title { font-size: 17px; font-weight: 800; color: var(--mw-heading, #111214); margin: 0 0 14px; }
+.awl-quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+.awl-quick-card {
+  background: var(--mw-white, #fff);
+  border-radius: var(--mw-radius-lg, 14px);
+  box-shadow: var(--mw-shadow, 0 4px 18px rgba(0, 0, 0, 0.06));
+  padding: 20px;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.awl-quick-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(0,0,0,0.1); }
+.awl-quick-icon {
+  width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center;
+  background: var(--mw-gold, #f5b301); color: #111214;
+}
+.awl-quick-title { font-size: 15px; font-weight: 800; color: var(--mw-heading, #111214); }
+.awl-quick-sub { font-size: 12px; color: var(--mw-muted, #8a8f98); line-height: 1.5; }
+
+@media (max-width: 960px) {
+  .awl-quick-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .awl-hero { padding: 28px 20px 0; }
+  .awl-quick-grid { grid-template-columns: 1fr; }
+}

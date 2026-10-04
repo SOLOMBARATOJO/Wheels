@@ -165,6 +165,39 @@ public class AuthService {
                 .orElseThrow(() -> new IllegalArgumentException("Utilisateur introuvable."));
         return UserInfo.of(user);
     }
+    
+    // ===== À COLLER dans AuthService.java (dans la classe, par ex. après getUser) =====
+
+    public UserInfo updateProfile(Long userId, String firstName, String lastName, String phone) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Utilisateur introuvable."));
+        requireText(firstName, "Prénom requis");
+        requireText(lastName, "Nom requis");
+        user.setFirstName(cap(firstName));
+        user.setLastName(cap(lastName));
+        user.setPhone(phone == null || phone.isBlank() ? null : phone.trim());
+        userRepository.save(user);
+        return UserInfo.of(user);
+    }
+
+    public void changePassword(Long userId, String currentPassword, String newPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Utilisateur introuvable."));
+        if (user.getPasswordHash() == null || currentPassword == null
+                || !matchesPassword(currentPassword, user.getPasswordHash())) {
+            throw new IllegalArgumentException("Mot de passe actuel incorrect.");
+        }
+        if (newPassword == null || newPassword.length() < 4) {
+            throw new IllegalArgumentException("Le nouveau mot de passe doit contenir au moins 4 caractères.");
+        }
+        user.setPasswordHash(hashPassword(newPassword));
+        userRepository.save(user);
+    }
+
+// ===== CORRECTIF conseillé dans hashPassword() : le sel n'est jamais rempli (16 octets à zéro) =====
+//   byte[] salt = new byte[SALT_BYTES];
+//   random.nextBytes(salt);          // <- ajouter cette ligne
+// Les anciens hachages restent valides (le sel est relu depuis la valeur stockée).
 
     private User findByActiveEmail(String email) {
         return userRepository.findByEmail(email)

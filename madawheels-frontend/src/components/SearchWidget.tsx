@@ -1,3 +1,6 @@
+import { motion } from "framer-motion";
+import clsx from "clsx";
+import { MapPin, Calendar, Clock, Search, UserRound } from "lucide-react";
 import { AGENCIES } from "../constants";
 import type { SearchParams } from "../types/vehicle";
 
@@ -20,7 +23,7 @@ export default function SearchWidget({
   sameReturn,
   onSameReturn,
   overlap,
-  buttonLabel = "🔍 Trouver un véhicule",
+  buttonLabel = "Trouver un véhicule",
 }: Props) {
   const set = (name: keyof SearchParams, value: string | number) =>
     onChange({ ...values, [name]: value });
@@ -28,9 +31,9 @@ export default function SearchWidget({
   const today = new Date().toISOString().split("T")[0];
 
   return (
-    <div className={`mw-widget ${overlap ? "overlap" : ""}`}>
+    <div className={clsx("mw-widget", overlap && "overlap")}>
       <div className="mw-field">
-        <label>📍 Lieu de départ</label>
+        <label><MapPin size={12} style={{ verticalAlign: -2, marginRight: 4 }} />Lieu de départ</label>
         <select value={values.departure} onChange={(e) => set("departure", e.target.value)}>
           <option value="">Sélectionner un lieu</option>
           {AGENCIES.map((a) => (
@@ -40,7 +43,7 @@ export default function SearchWidget({
       </div>
 
       <div className="mw-field">
-        <label>📍 Lieu de retour</label>
+        <label><MapPin size={12} style={{ verticalAlign: -2, marginRight: 4 }} />Lieu de retour</label>
         <select
           value={sameReturn ? values.departure : values.returnLocation}
           onChange={(e) => set("returnLocation", e.target.value)}
@@ -54,7 +57,7 @@ export default function SearchWidget({
       </div>
 
       <div className="mw-field">
-        <label>📅 Date de départ</label>
+        <label><Calendar size={12} style={{ verticalAlign: -2, marginRight: 4 }} />Date de départ</label>
         <input
           type="date"
           min={today}
@@ -67,12 +70,12 @@ export default function SearchWidget({
       </div>
 
       <div className="mw-field">
-        <label>🕐 Heure de départ</label>
+        <label><Clock size={12} style={{ verticalAlign: -2, marginRight: 4 }} />Heure de départ</label>
         <input type="time" value={values.startTime} onChange={(e) => set("startTime", e.target.value)} />
       </div>
 
       <div className="mw-field">
-        <label>📅 Date de retour</label>
+        <label><Calendar size={12} style={{ verticalAlign: -2, marginRight: 4 }} />Date de retour</label>
         <input
           type="date"
           min={values.startDate || today}
@@ -82,12 +85,12 @@ export default function SearchWidget({
       </div>
 
       <div className="mw-field">
-        <label>🕐 Heure de retour</label>
+        <label><Clock size={12} style={{ verticalAlign: -2, marginRight: 4 }} />Heure de retour</label>
         <input type="time" value={values.endTime} onChange={(e) => set("endTime", e.target.value)} />
       </div>
 
       <div className="mw-field">
-        <label>Âge</label>
+        <label><UserRound size={12} style={{ verticalAlign: -2, marginRight: 4 }} />Âge</label>
         <div className="mw-age">
           <input
             type="number"
@@ -107,9 +110,15 @@ export default function SearchWidget({
         </label>
       )}
 
-      <button className="mw-widget-btn" onClick={onSearch} disabled={loading}>
+      <motion.button
+        className="mw-widget-btn"
+        onClick={onSearch}
+        disabled={loading}
+        whileTap={{ scale: 0.96 }}
+      >
+        <Search size={15} />
         {loading ? "Recherche..." : buttonLabel}
-      </button>
+      </motion.button>
     </div>
   );
 }

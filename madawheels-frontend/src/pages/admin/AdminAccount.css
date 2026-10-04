@@ -1,0 +1,57 @@
+.awa-page { padding: 36px 24px 72px; }
+.awa-head { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
+.awa-avatar {
+  width: 58px; height: 58px; border-radius: 50%; background: #14161a; color: var(--mw-gold, #f5b301);
+  display: grid; place-items: center; font-weight: 800; font-size: 19px; flex-shrink: 0;
+}
+.awa-name { font-size: 20px; font-weight: 800; color: var(--mw-heading, #111214); }
+.awa-email { font-size: 13px; color: var(--mw-muted, #8a8f98); }
+
+.awa-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.awa-card {
+  background: var(--mw-white, #fff);
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--mw-radius-lg, 14px);
+  box-shadow: var(--mw-shadow, 0 4px 18px rgba(0, 0, 0, 0.06));
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: transform 0.15s, box-shadow 0.15s;
+  font-family: inherit;
+}
+.awa-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(0,0,0,0.1); }
+.awa-card.danger:hover { box-shadow: 0 10px 24px rgba(214, 69, 69, 0.18); }
+.awa-card-icon {
+  width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center;
+  background: var(--mw-gold, #f5b301); color: #111214;
+}
+.awa-card.danger .awa-card-icon { background: #fdecec; color: #d64545; }
+.awa-card-title { font-size: 15px; font-weight: 800; color: var(--mw-heading, #111214); }
+.awa-card-sub { font-size: 12px; color: var(--mw-muted, #8a8f98); line-height: 1.5; }
+
+/* Boîte de dialogue de confirmation */
+.awa-overlay {
+  position: fixed; inset: 0; background: rgba(17, 18, 20, 0.55);
+  display: grid; place-items: center; z-index: 100; padding: 20px;
+}
+.awa-dialog {
+  background: #fff; border-radius: 16px; padding: 26px; width: 100%; max-width: 360px;
+  text-align: center;
+}
+.awa-dialog-icon {
+  width: 52px; height: 52px; border-radius: 50%; background: #fdecec; color: #d64545;
+  display: grid; place-items: center; margin: 0 auto 14px;
+}
+.awa-dialog h3 { margin: 0 0 8px; font-size: 17px; font-weight: 800; color: var(--mw-heading, #111214); }
+.awa-dialog p { margin: 0 0 20px; font-size: 13px; color: var(--mw-muted, #8a8f98); line-height: 1.5; }
+.awa-dialog-actions { display: flex; gap: 10px; }
+.awa-dialog-actions button { flex: 1; padding: 11px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
+.awa-btn-no { border: 1px solid #dfe3e8; background: #fff; color: #333; }
+.awa-btn-yes { border: none; background: #d64545; color: #fff; }
+.awa-btn-yes:hover { background: #c23c3c; }
+
+@media (max-width: 960px) { .awa-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .awa-grid { grid-template-columns: 1fr; } }

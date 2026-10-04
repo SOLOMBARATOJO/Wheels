@@ -1621,3 +1621,163 @@ input {
     grid-template-columns: 1fr;
   }
 }
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  #receipt-print-area {
+    box-shadow: none !important;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    background: #fff !important;
+  }
+  @page {
+    size: A4;
+    margin: 20mm;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  #receipt-print-area {
+    box-shadow: none !important;
+    margin: 0;
+  }
+  body {
+    background: #fff !important;
+  }
+  @page {
+    size: A4;
+    margin: 20mm;
+  }
+}
+
+/* ---------- Logo mark ---------- */
+.mw-logo-mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--mw-gold-bright), var(--mw-gold-deep));
+  flex-shrink: 0;
+}
+
+.mw-logo-letters {
+  font-family: var(--mw-serif);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--mw-ink);
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.mw-logo-road {
+  position: absolute;
+  bottom: 7px;
+  left: 7px;
+  right: 7px;
+  height: 2px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--mw-ink) 0px,
+    var(--mw-ink) 4px,
+    transparent 4px,
+    transparent 7px
+  );
+  opacity: 0.35;
+  border-radius: 2px;
+}
+
+.mw-logo-pin {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50% 50% 50% 0;
+  background: var(--mw-ink);
+  transform: rotate(-45deg);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+.mw-logo-pin::after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--mw-gold-bright);
+  transform: rotate(45deg);
+}
+
+/* ---------- Radio mode chauffeur ---------- */
+.mw-radio-row { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; color: var(--mw-heading); margin: 14px 0 10px; cursor: pointer; }
+.mw-radio-row input[type="radio"] { width: 18px; height: 18px; accent-color: var(--mw-gold); cursor: pointer; }
+
+/* ---------- Client account dropdown ---------- */
+.mw-account { position: relative; }
+.mw-account-trigger {
+  display: flex; align-items: center; gap: 10px;
+  background: transparent; border: 1px solid var(--mw-gold);
+  border-radius: var(--mw-radius-sm); padding: 7px 14px;
+  color: #fff; cursor: pointer; transition: background 0.15s, color 0.15s;
+}
+.mw-account-trigger:hover { background: var(--mw-gold-bright); color: var(--mw-ink); }
+.mw-account-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--mw-gold), var(--mw-gold-deep));
+  color: #fff; font-weight: 700; font-size: 12px;
+  display: grid; place-items: center; flex-shrink: 0;
+}
+.mw-account-avatar.big { width: 44px; height: 44px; font-size: 15px; }
+.mw-account-name { font-size: 13px; font-weight: 600; }
+
+.mw-account-menu {
+  position: absolute; top: calc(100% + 10px); right: 0;
+  background: #fff; border-radius: 14px; width: 280px;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.18);
+  overflow: hidden; z-index: 80;
+}
+.mw-account-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 18px; border-bottom: 1px solid #eef0f3;
+}
+.mw-account-fullname { font-weight: 700; font-size: 14px; color: var(--mw-heading); }
+.mw-account-email { font-size: 12px; color: var(--mw-muted); }
+.mw-account-items { padding: 8px; display: flex; flex-direction: column; }
+.mw-account-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 10px; font-size: 13.5px;
+  color: var(--mw-heading); font-weight: 500; background: none; border: none;
+  cursor: pointer; text-align: left; width: 100%; text-decoration: none;
+}
+.mw-account-item:hover { background: var(--mw-bg); }
+.mw-account-item.danger { color: #d64545; border-top: 1px solid #eef0f3; border-radius: 0; margin-top: 4px; padding: 12px; }
+.mw-account-item.danger:hover { background: #fdecec; }
+
+
+/* Boîte du profil : largeur adaptée au contenu (email complet visible) */
+.mw-account-menu {
+  width: max-content;
+  min-width: 300px;
+  max-width: min(440px, calc(100vw - 24px));
+}
+
+/* Permet à la zone texte de se réduire au lieu de déborder */
+.mw-account-head > div {
+  min-width: 0;
+}
+
+/* Un email très long passe à la ligne au lieu d'être coupé */
+.mw-account-email {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

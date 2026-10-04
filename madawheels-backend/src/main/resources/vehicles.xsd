@@ -1,7 +1,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.madawheels.com/vehicles" targetNamespace="http://www.madawheels.com/vehicles" elementFormDefault="qualified">
-<!--  =========================
+<!--   =========================
          SEARCH REQUEST / RESPONSE (inchangé)
-         =========================  -->
+         =========================   -->
 <xs:element name="searchVehiclesRequest">
 <xs:complexType>
 <xs:sequence>
@@ -12,7 +12,7 @@
 <xs:element name="endDate" type="xs:string"/>
 <xs:element name="endTime" type="xs:string"/>
 <xs:element name="driverAge" type="xs:int"/>
-<!-- Filtres de flotte (optionnels, 0 = non filtré) -->
+<!--  Filtres de flotte (optionnels, 0 = non filtré)  -->
 <xs:element name="type" type="xs:string" minOccurs="0"/>
 <xs:element name="transmission" type="xs:string" minOccurs="0"/>
 <xs:element name="fuel" type="xs:string" minOccurs="0"/>
@@ -45,9 +45,9 @@
 <xs:element name="available" type="xs:boolean"/>
 </xs:sequence>
 </xs:complexType>
-<!--  =========================
+<!--   =========================
          CREATE RESERVATION (avec options / assurances)
-         =========================  -->
+         =========================   -->
 <xs:complexType name="selectedOption">
 <xs:sequence>
 <xs:element name="optionId" type="xs:long"/>
@@ -96,9 +96,9 @@
 </xs:sequence>
 </xs:complexType>
 </xs:element>
-<!--  =========================
+<!--   =========================
          FIND RESERVATIONS (mes réservations, par email)
-         =========================  -->
+         =========================   -->
 <xs:element name="findReservationsRequest">
 <xs:complexType>
 <xs:sequence>
@@ -124,9 +124,28 @@
 <xs:element name="optionsPrice" type="xs:decimal"/>
 <xs:element name="totalPrice" type="xs:decimal"/>
 <xs:element name="createdAt" type="xs:string" minOccurs="0"/>
+<xs:element name="paymentMethod" type="xs:string" minOccurs="0"/>
+<xs:element name="cardHolder" type="xs:string" minOccurs="0"/>
+<xs:element name="cardLast4" type="xs:string" minOccurs="0"/>
+<xs:element name="paidAt" type="xs:string" minOccurs="0"/>
 <xs:element name="option" type="tns:reservationOption" minOccurs="0" maxOccurs="unbounded"/>
 </xs:sequence>
 </xs:complexType>
+<xs:element name="deleteReservationRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="userId" type="xs:long"/>
+<xs:element name="reservationId" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="deleteReservationResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="message" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
 <xs:element name="findReservationsResponse">
 <xs:complexType>
 <xs:sequence>
@@ -134,9 +153,9 @@
 </xs:sequence>
 </xs:complexType>
 </xs:element>
-<!--  =========================
+<!--   =========================
          AUTHENTIFICATION (inscription, vérification par code, connexion)
-         =========================  -->
+         =========================   -->
 <xs:complexType name="userInfo">
 <xs:sequence>
 <xs:element name="userId" type="xs:long"/>
@@ -215,6 +234,272 @@
 <xs:sequence>
 <xs:element name="user" type="tns:userInfo"/>
 <xs:element name="message" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<!--  ===================== ESPACE ADMINISTRATEUR =====================  -->
+<xs:complexType name="adminReservation">
+<xs:sequence>
+<xs:element name="reservationId" type="xs:long"/>
+<xs:element name="reference" type="xs:string"/>
+<xs:element name="status" type="xs:string"/>
+<xs:element name="userId" type="xs:long"/>
+<xs:element name="vehicleId" type="xs:long"/>
+<xs:element name="departure" type="xs:string"/>
+<xs:element name="returnLocation" type="xs:string"/>
+<xs:element name="startDate" type="xs:string"/>
+<xs:element name="endDate" type="xs:string"/>
+<xs:element name="totalPrice" type="xs:decimal"/>
+<xs:element name="adminNote" type="xs:string" minOccurs="0"/>
+<xs:element name="createdAt" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+<xs:element name="listReservationsForAdminRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="adminUserId" type="xs:long"/>
+<xs:element name="status" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="listReservationsForAdminResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="reservation" type="tns:adminReservation" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="validateReservationRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="adminUserId" type="xs:long"/>
+<xs:element name="reservationId" type="xs:long"/>
+<xs:element name="adminNote" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="validateReservationResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="reservationId" type="xs:long"/>
+<xs:element name="status" type="xs:string"/>
+<xs:element name="emailSent" type="xs:boolean"/>
+<xs:element name="message" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="refuseReservationRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="adminUserId" type="xs:long"/>
+<xs:element name="reservationId" type="xs:long"/>
+<xs:element name="reason" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="refuseReservationResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="reservationId" type="xs:long"/>
+<xs:element name="status" type="xs:string"/>
+<xs:element name="emailSent" type="xs:boolean"/>
+<xs:element name="message" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="submitPaymentRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="reference" type="xs:string"/>
+<xs:element name="cardHolder" type="xs:string"/>
+<xs:element name="cardNumber" type="xs:string"/>
+<xs:element name="expiry" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="submitPaymentResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="reservationId" type="xs:long"/>
+<xs:element name="status" type="xs:string"/>
+<xs:element name="emailSent" type="xs:boolean"/>
+<xs:element name="message" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<!--  Gestion de la flotte  -->
+<xs:element name="createVehicleRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="adminUserId" type="xs:long"/>
+<xs:element name="name" type="xs:string"/>
+<xs:element name="brand" type="xs:string"/>
+<xs:element name="model" type="xs:string"/>
+<xs:element name="type" type="xs:string"/>
+<xs:element name="transmission" type="xs:string"/>
+<xs:element name="seats" type="xs:int"/>
+<xs:element name="doors" type="xs:int"/>
+<xs:element name="fuel" type="xs:string"/>
+<xs:element name="pricePerDay" type="xs:decimal"/>
+<xs:element name="imageUrl" type="xs:string" minOccurs="0"/>
+<xs:element name="description" type="xs:string" minOccurs="0"/>
+<xs:element name="departure" type="xs:string"/>
+<xs:element name="available" type="xs:boolean" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="createVehicleResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="vehicleId" type="xs:long"/>
+<xs:element name="message" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="updateVehicleRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="adminUserId" type="xs:long"/>
+<xs:element name="vehicleId" type="xs:long"/>
+<xs:element name="name" type="xs:string" minOccurs="0"/>
+<xs:element name="brand" type="xs:string" minOccurs="0"/>
+<xs:element name="model" type="xs:string" minOccurs="0"/>
+<xs:element name="type" type="xs:string" minOccurs="0"/>
+<xs:element name="transmission" type="xs:string" minOccurs="0"/>
+<xs:element name="seats" type="xs:int" minOccurs="0"/>
+<xs:element name="doors" type="xs:int" minOccurs="0"/>
+<xs:element name="fuel" type="xs:string" minOccurs="0"/>
+<xs:element name="pricePerDay" type="xs:decimal" minOccurs="0"/>
+<xs:element name="imageUrl" type="xs:string" minOccurs="0"/>
+<xs:element name="description" type="xs:string" minOccurs="0"/>
+<xs:element name="departure" type="xs:string" minOccurs="0"/>
+<xs:element name="available" type="xs:boolean" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="updateVehicleResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="vehicleId" type="xs:long"/>
+<xs:element name="message" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="deleteVehicleRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="adminUserId" type="xs:long"/>
+<xs:element name="vehicleId" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="deleteVehicleResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="message" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="adminSearchVehiclesRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="adminUserId" type="xs:long"/>
+<xs:element name="keyword" type="xs:string" minOccurs="0"/>
+<xs:element name="departure" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="adminSearchVehiclesResponse">
+<xs:complexType>
+<xs:sequence>
+<!--  réutilise le même type "vehicle" que searchVehiclesResponse  -->
+<xs:element name="vehicle" type="tns:vehicle" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<!--  ===================== CLIENTS (vue admin / CRM) =====================  -->
+<xs:complexType name="clientSummary">
+<xs:sequence>
+<xs:element name="userId" type="xs:long"/>
+<xs:element name="firstName" type="xs:string"/>
+<xs:element name="lastName" type="xs:string"/>
+<xs:element name="email" type="xs:string"/>
+<xs:element name="phone" type="xs:string" minOccurs="0"/>
+<xs:element name="status" type="xs:string"/>
+<xs:element name="reservationsCount" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+<xs:element name="listClientsForAdminRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="adminUserId" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="listClientsForAdminResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="client" type="tns:clientSummary" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<!--  ===================== TRANSACTIONS (paiements clients, vue admin) =====================  -->
+<xs:complexType name="transaction">
+<xs:sequence>
+<xs:element name="reservationId" type="xs:long"/>
+<xs:element name="reference" type="xs:string"/>
+<xs:element name="status" type="xs:string"/>
+<xs:element name="clientFirstName" type="xs:string"/>
+<xs:element name="clientLastName" type="xs:string"/>
+<xs:element name="clientEmail" type="xs:string"/>
+<xs:element name="clientPhone" type="xs:string" minOccurs="0"/>
+<xs:element name="vehicleName" type="xs:string"/>
+<xs:element name="departure" type="xs:string"/>
+<xs:element name="returnLocation" type="xs:string"/>
+<xs:element name="startDate" type="xs:string"/>
+<xs:element name="endDate" type="xs:string"/>
+<xs:element name="vehiclePrice" type="xs:decimal"/>
+<xs:element name="optionsPrice" type="xs:decimal"/>
+<xs:element name="totalPrice" type="xs:decimal"/>
+<xs:element name="paymentMethod" type="xs:string" minOccurs="0"/>
+<xs:element name="cardHolder" type="xs:string" minOccurs="0"/>
+<xs:element name="cardLastFour" type="xs:string" minOccurs="0"/>
+<xs:element name="paidAt" type="xs:string" minOccurs="0"/>
+<xs:element name="createdAt" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+<xs:element name="listTransactionsForAdminRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="adminUserId" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="listTransactionsForAdminResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="transaction" type="tns:transaction" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<!--  ===================== STATISTIQUES (tableau de bord admin) =====================  -->
+<xs:element name="adminStatsRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="adminUserId" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="adminStatsResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="totalClients" type="xs:int"/>
+<xs:element name="totalVehicles" type="xs:int"/>
+<xs:element name="availableVehicles" type="xs:int"/>
+<xs:element name="pendingReservations" type="xs:int"/>
+<xs:element name="validatedReservations" type="xs:int"/>
+<xs:element name="completedReservations" type="xs:int"/>
+<xs:element name="refusedReservations" type="xs:int"/>
 </xs:sequence>
 </xs:complexType>
 </xs:element>

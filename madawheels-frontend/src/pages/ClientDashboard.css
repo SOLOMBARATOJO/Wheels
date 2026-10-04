@@ -1,0 +1,36 @@
+.mwc-page { padding: 36px 24px 72px; }
+.mwc-title { font-size: 26px; font-weight: 800; color: var(--mw-heading); margin: 0 0 4px; }
+.mwc-subtitle { margin: 0 0 28px; font-size: 14px; color: var(--mw-muted); }
+
+.mwc-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+.mwc-stat {
+  background: var(--mw-white); border-radius: var(--mw-radius-lg); box-shadow: var(--mw-shadow);
+  padding: 20px; display: flex; align-items: center; gap: 14px; min-width: 0;
+}
+.mwc-stat-icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0; background: #fff4d1; color: #8a6400; }
+.mwc-stat.brand .mwc-stat-icon { background: #111214; color: var(--mw-gold); }
+.mwc-stat.warn .mwc-stat-icon { background: #fff4d1; color: #8a6400; }
+.mwc-stat.ok .mwc-stat-icon { background: #e9f9ef; color: #1e9e5a; }
+.mwc-stat.info .mwc-stat-icon { background: #eaf1ff; color: #2f5fd6; }
+.mwc-stat-value { font-size: 22px; font-weight: 800; color: var(--mw-heading); line-height: 1.1; white-space: nowrap; }
+.mwc-stat-label { font-size: 12px; color: var(--mw-muted); font-weight: 600; }
+
+.mwc-section-title { font-size: 17px; font-weight: 800; color: var(--mw-heading); margin: 0 0 14px; }
+.mwc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.mwc-card {
+  background: var(--mw-white); border-radius: var(--mw-radius-lg); box-shadow: var(--mw-shadow);
+  padding: 20px; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 12px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.mwc-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(0,0,0,0.1); }
+.mwc-card-icon { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; background: var(--mw-gold); color: #111214; }
+.mwc-card-title { font-size: 15px; font-weight: 800; color: var(--mw-heading); }
+.mwc-card-sub { font-size: 12px; color: var(--mw-muted); line-height: 1.5; }
+.mwc-card-arrow { margin-top: auto; font-size: 12px; font-weight: 700; color: var(--mw-gold-deep); display: flex; align-items: center; gap: 4px; }
+
+@media (max-width: 960px) {
+  .mwc-stats, .mwc-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .mwc-stats, .mwc-grid { grid-template-columns: 1fr; }
+}

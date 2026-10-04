@@ -1,0 +1,19 @@
+.lgd-overlay {
+  position: fixed; inset: 0; background: rgba(17, 18, 20, 0.55);
+  display: grid; place-items: center; z-index: 1000; padding: 20px;
+}
+.lgd-dialog {
+  background: #fff; border-radius: 16px; padding: 26px; width: 100%; max-width: 360px;
+  text-align: center;
+}
+.lgd-icon {
+  width: 52px; height: 52px; border-radius: 50%; background: #fdecec; color: #d64545;
+  display: grid; place-items: center; margin: 0 auto 14px;
+}
+.lgd-dialog h3 { margin: 0 0 8px; font-size: 17px; font-weight: 800; color: var(--mw-heading, #111214); }
+.lgd-dialog p { margin: 0 0 20px; font-size: 13px; color: var(--mw-muted, #8a8f98); line-height: 1.5; }
+.lgd-actions { display: flex; gap: 10px; }
+.lgd-actions button { flex: 1; padding: 11px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
+.lgd-no { border: 1px solid #dfe3e8; background: #fff; color: #333; }
+.lgd-yes { border: none; background: #d64545; color: #fff; }
+.lgd-yes:hover { background: #c23c3c; }

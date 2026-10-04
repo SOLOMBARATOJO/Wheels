@@ -1,4 +1,5 @@
 import { callSoap, fieldText, NS } from "./soapClient";
+import { getSession } from "./authService";
 import type { ReservationRequest, ReservationResult, ReservationOptionLine, ReservationSummary } from "../types/reservation";
 
 type XmlContainer = {
@@ -78,6 +79,41 @@ export async function findReservations(email: string): Promise<ReservationSummar
     optionsPrice: Number(fieldText(r, "optionsPrice")),
     totalPrice: Number(fieldText(r, "totalPrice")),
     createdAt: fieldText(r, "createdAt"),
+    paymentMethod: fieldText(r, "paymentMethod"),
+    cardHolder: fieldText(r, "cardHolder"),
+    cardLast4: fieldText(r, "cardLast4"),
+    paidAt: fieldText(r, "paidAt"),
     options: parseOptionLines(r),
   }));
+}
+
+export async function deleteReservation(reservationId: number): Promise<string> {
+  const session = getSession();
+  if (!session) throw new Error("Session expirée. Reconnectez-vous.");
+  const body = `<veh:deleteReservationRequest>
+    <veh:userId>${session.userId}</veh:userId>
+    <veh:reservationId>${reservationId}</veh:reservationId>
+  </veh:deleteReservationRequest>`;
+  const doc = await callSoap(body);
+  return fieldText(doc.documentElement, "message");
+}
+
+export async function submitPayment(payload: {
+  reference: string;
+  cardHolder: string;
+  cardNumber: string;
+  expiry: string;
+}): Promise<{ status: string; message: string }> {
+  const body = `<veh:submitPaymentRequest>
+    <veh:reference>${payload.reference}</veh:reference>
+    <veh:cardHolder>${payload.cardHolder}</veh:cardHolder>
+    <veh:cardNumber>${payload.cardNumber}</veh:cardNumber>
+    <veh:expiry>${payload.expiry}</veh:expiry>
+  </veh:submitPaymentRequest>`;
+
+  const doc = await callSoap(body);
+  return {
+    status: fieldText(doc.documentElement, "status"),
+    message: fieldText(doc.documentElement, "message"),
+  };
 }

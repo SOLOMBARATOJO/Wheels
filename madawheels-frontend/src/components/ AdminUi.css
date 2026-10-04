@@ -1,0 +1,55 @@
+/* ---------- Menu profil admin ---------- */
+.mwm-wrap { position: relative; }
+button.mw-login.mwm-trigger { cursor: pointer; font: inherit; background: transparent; color: #fff; display: inline-flex; align-items: center; gap: 8px; }
+.mwm-caret { transition: transform .2s; }
+.mwm-trigger[aria-expanded="true"] .mwm-caret { transform: rotate(180deg); }
+
+.mwm-menu {
+  position: absolute; right: 0; top: calc(100% + 10px); width: 290px; z-index: 300;
+  background: #fff; color: #1a1a1a; border: 1px solid #e5e7eb; border-radius: 14px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .28); overflow: hidden;
+}
+.mwm-menu-head { display: flex; align-items: center; gap: 12px; padding: 16px; background: #111214; color: #fff; }
+.mwm-avatar {
+  width: 42px; height: 42px; border-radius: 50%; flex: none; background: #F5B301; color: #111214;
+  font-weight: 800; display: flex; align-items: center; justify-content: center;
+}
+.mwm-menu-id { min-width: 0; display: flex; flex-direction: column; }
+.mwm-menu-id strong { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mwm-menu-id small { color: #b6b6b6; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mwm-menu-list { padding: 8px; display: flex; flex-direction: column; }
+.mwm-menu-list a, .mwm-menu-list button {
+  display: flex; align-items: center; gap: 12px; padding: 11px 12px; border: 0; border-radius: 10px;
+  background: transparent; color: #1a1a1a; font: inherit; font-size: 14px; font-weight: 600;
+  text-align: left; text-decoration: none; cursor: pointer; width: 100%;
+}
+.mwm-menu-list a:hover, .mwm-menu-list button:hover { background: #FFF6DA; }
+.mwm-menu-list a:focus-visible, .mwm-menu-list button:focus-visible { outline: 2px solid #F5B301; outline-offset: -2px; }
+.mwm-sep { height: 1px; background: #eceef1; margin: 6px 4px; }
+.mwm-menu-list .mwm-danger { color: #c0392b; }
+.mwm-menu-list .mwm-danger:hover { background: #fdecea; }
+
+@media (max-width: 900px) { .mwm-menu { position: fixed; right: 12px; left: 12px; width: auto; top: 76px; } }
+
+/* ---------- Boîte de dialogue ---------- */
+.mwx-dialog-backdrop {
+  position: fixed; inset: 0; z-index: 1000; padding: 20px; display: flex; align-items: center; justify-content: center;
+  background: rgba(10, 10, 12, .62); backdrop-filter: blur(3px);
+}
+.mwx-dialog {
+  width: 100%; max-width: 420px; padding: 28px; border-radius: 18px; background: #fff; text-align: center;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .35);
+}
+.mwx-dialog-icon {
+  width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center;
+  background: #fdecea; color: #c0392b;
+}
+.mwx-dialog h2 { margin: 0 0 8px; font-size: 20px; color: #111214; }
+.mwx-dialog p { margin: 0; color: #555; line-height: 1.6; font-size: 14px; }
+.mwx-dialog-actions { display: flex; gap: 12px; margin-top: 24px; }
+.mwx-dialog-actions button { flex: 1; padding: 12px 14px; border-radius: 10px; font: inherit; font-weight: 700; font-size: 14px; cursor: pointer; }
+.mwx-btn-cancel { background: #fff; color: #111214; border: 1.5px solid #d5d8de; }
+.mwx-btn-cancel:hover { border-color: #111214; }
+.mwx-btn-danger { background: #c0392b; color: #fff; border: 1.5px solid #c0392b; }
+.mwx-btn-danger:hover { background: #a93226; }
+.mwx-dialog-actions button:focus-visible { outline: 3px solid #F5B301; outline-offset: 2px; }
