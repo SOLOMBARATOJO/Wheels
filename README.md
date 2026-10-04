@@ -245,5 +245,5 @@ Un compte administrateur correspond à un utilisateur dont le rôle est **ADMIN*
 ---
 
 ## 👥 Auteurs
-
+SOLOMBARA Tojo Mampisaina
 Projet **MadaWheels**, cours Tech Java, M1 GB, ENI.
